@@ -39,8 +39,15 @@ def analyze():
             paused = paused and True
             print(f'pausebotmod: {symbol} Market not looking too good, bot paused from buying {ma_sell}/{THRESHOLD}.')
         else:
-            print(f'pausebotmod: {symbol} Market looks ok, bot is running {ma_sell}/{THRESHOLD} Waiting {TIME_TO_WAIT} minutes for next market checkup ')
             paused = False
+
+
+    if paused == True:
+        print(f'pausebotmod: Market not looking too good, bot paused from buying. Waiting {TIME_TO_WAIT} minutes for next market checkup ')
+    
+    elif paused == False:
+        print(f'pausebotmod: Market looks ok, bot is running. Waiting {TIME_TO_WAIT} minutes for next market checkup ')
+
 
     return paused
     
