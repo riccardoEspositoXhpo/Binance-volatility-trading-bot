@@ -380,8 +380,15 @@ def sell_coins():
             continue
 
         # check that the price is below the stop loss or above take profit (if trailing stop loss not used) and sell if this is the case
-        if LastPrice < SL or LastPrice > TP and not USE_TRAILING_STOP_LOSS:
-            print(f"{txcolors.SELL_PROFIT if PriceChange >= 0. else txcolors.SELL_LOSS}TP or SL reached, selling {coins_bought[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} : {PriceChange-(TRADING_FEE*2):.2f}% Est:${(QUANTITY*(PriceChange-(TRADING_FEE*2)))/100:.2f}{txcolors.DEFAULT}")
+        if LastPrice < SL or (LastPrice > TP and not USE_TRAILING_STOP_LOSS):
+
+            if LastPrice < SL:
+                print(f"{txcolors.SELL_PROFIT if PriceChange >= 0. else txcolors.SELL_LOSS}SL reached, selling {coins_bought[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} : {PriceChange-(TRADING_FEE*2):.2f}% Est:${(QUANTITY*(PriceChange-(TRADING_FEE*2)))/100:.2f}{txcolors.DEFAULT}")
+
+            if (LastPrice > TP and not USE_TRAILING_STOP_LOSS):
+                print(f"{txcolors.SELL_PROFIT if PriceChange >= 0. else txcolors.SELL_LOSS}TP reached, selling {coins_bought[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} : {PriceChange-(TRADING_FEE*2):.2f}% Est:${(QUANTITY*(PriceChange-(TRADING_FEE*2)))/100:.2f}{txcolors.DEFAULT}")
+
+
 
             # try to create a real order
             try:
@@ -502,6 +509,8 @@ if __name__ == '__main__':
     USE_TRAILING_STOP_LOSS = parsed_config['trading_options']['USE_TRAILING_STOP_LOSS']
     TRAILING_STOP_LOSS = parsed_config['trading_options']['TRAILING_STOP_LOSS']
     TRAILING_TAKE_PROFIT = parsed_config['trading_options']['TRAILING_TAKE_PROFIT']
+    SELL_STAGNATING_COIN = parsed_config['trading_options']['SELL_STAGNATING_COIN']
+    SELL_STAGNATING_INTERVAL = parsed_config['trading_options']['SELL_STAGNATING_INTERVAL']
     TRADING_FEE = parsed_config['trading_options']['TRADING_FEE']
     SIGNALLING_MODULES = parsed_config['trading_options']['SIGNALLING_MODULES']
     if DEBUG_SETTING or args.debug:
