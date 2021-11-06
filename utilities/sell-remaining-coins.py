@@ -6,6 +6,7 @@ import os
 from binance.client import Client
 from datetime import datetime
 
+
 # Load helper modules
 from helpers.parameters import (
     parse_args, load_config
@@ -31,8 +32,8 @@ class txcolors:
 
 args = parse_args()
 
-DEFAULT_CONFIG_FILE = '../config.yml'
-DEFAULT_CREDS_FILE = '../creds.yml'
+DEFAULT_CONFIG_FILE = './config.yml'
+DEFAULT_CREDS_FILE = './creds.yml'
 
 config_file = args.config if args.config else DEFAULT_CONFIG_FILE
 creds_file = args.creds if args.creds else DEFAULT_CREDS_FILE

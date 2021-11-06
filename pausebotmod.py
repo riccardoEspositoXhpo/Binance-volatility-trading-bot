@@ -7,9 +7,11 @@ INTERVAL = Interval.INTERVAL_1_MINUTE #Timeframe for analysis
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
+
+# I don't agree that we should be looking at Bitcoin to figure out the pausing.
 SYMBOL = 'BTCUSDT'
-THRESHOLD = 20 # 7 of 15 MA's indicating sell
-TIME_TO_WAIT = 1 # Minutes to wait between analysis
+THRESHOLD = 16 # 10 of 15 MA's indicating sell
+TIME_TO_WAIT = 2 # Minutes to wait between analysis
 FULL_LOG = False # List analysis result to console
 
 def analyze():
@@ -31,6 +33,7 @@ def analyze():
         print(e)
     
     ma_sell = analysis.moving_averages['SELL']
+    print(analysis.moving_averages)
     if ma_sell >= THRESHOLD:
         paused = True
         print(f'pausebotmod: Market not looking too good, bot paused from buying {ma_sell}/{THRESHOLD} Waiting {TIME_TO_WAIT} minutes for next market checkup')
