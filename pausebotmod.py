@@ -8,9 +8,9 @@ INTERVAL = Interval.INTERVAL_1_MINUTE #Timeframe for analysis
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
 SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
-THRESHOLD = 13 # 7 of 15 MA's indicating sell
+THRESHOLD = 10 # 7 of 15 MA's indicating sell
 TIME_TO_WAIT = 2 # Minutes to wait between analysis
-FULL_LOG = False # List analysis result to console
+FULL_LOG = True # List analysis result to console
 
 def analyze():
 
