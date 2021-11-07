@@ -365,6 +365,20 @@ def sell_coins():
     coins_sold = {}
 
     for coin in list(coins_bought):
+
+        stagnating_coin = False
+        # check if stagnating coin setting is active
+        if SELL_STAGNATING_COIN:
+
+            # convert timestamp to datetime to check interval
+            datetimeFromTimestamp = datetime.fromtimestamp(coins_bought[coin]['timestamp'])
+
+            # if the coin has not reached a tp or a sl (implies the coin is stagnating) and sufficient time has passed since the coin purchase, we flag as stagnating coin
+            if coins_bought[coin]['tp_sl_hit'] == False and (datetimeFromTimestamp < datetime.now() - timedelta(minutes=float(SELL_STAGNATING_INTERVAL))):
+                stagnating_coin = True
+                
+        
+        
         # define stop loss and take profit
         TP = float(coins_bought[coin]['bought_at']) + (float(coins_bought[coin]['bought_at']) * coins_bought[coin]['take_profit']) / 100
         SL = float(coins_bought[coin]['bought_at']) + (float(coins_bought[coin]['bought_at']) * coins_bought[coin]['stop_loss']) / 100
@@ -377,14 +391,17 @@ def sell_coins():
         # check that the price is above the take profit and readjust SL and TP accordingly if trialing stop loss used
         if LastPrice > TP and USE_TRAILING_STOP_LOSS:
 
+            # Flag that tp or sl have been hit at least once. This indicates an upward trend in the coin, so we do not want to sell it.
+            coins_bought[coin]['tp_sl_hit'] = True
+
             # increasing TP by TRAILING_TAKE_PROFIT (essentially next time to readjust SL)
             coins_bought[coin]['take_profit'] = PriceChange + TRAILING_TAKE_PROFIT
             coins_bought[coin]['stop_loss'] = coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
             continue
 
-        # check that the price is below the stop loss or above take profit (if trailing stop loss not used) and sell if this is the case
-        if LastPrice < SL or (LastPrice > TP and not USE_TRAILING_STOP_LOSS):
+        # check that the price is below the stop loss or above take profit (if trailing stop loss not used) and sell if this is the case. Also sell if coin is stagnating.
+        if LastPrice < SL or (LastPrice > TP and not USE_TRAILING_STOP_LOSS) or stagnating_coin:
 
             if LastPrice < SL:
                 print(f"{txcolors.SELL_PROFIT if PriceChange >= 0. else txcolors.SELL_LOSS}SL reached, selling {coins_bought[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} : {PriceChange-(TRADING_FEE*2):.2f}% Est:${(QUANTITY*(PriceChange-(TRADING_FEE*2)))/100:.2f}{txcolors.DEFAULT}")
@@ -392,6 +409,8 @@ def sell_coins():
             if (LastPrice > TP and not USE_TRAILING_STOP_LOSS):
                 print(f"{txcolors.SELL_PROFIT if PriceChange >= 0. else txcolors.SELL_LOSS}TP reached, selling {coins_bought[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} : {PriceChange-(TRADING_FEE*2):.2f}% Est:${(QUANTITY*(PriceChange-(TRADING_FEE*2)))/100:.2f}{txcolors.DEFAULT}")
 
+            if(stagnating_coin):
+                print(f"{coin} has not hit SL or TP in {SELL_STAGNATING_INTERVAL} minutes. Coin is stagnating, preparing to sell {coins_bought[coin]['volume']} {coin}.")
 
 
             # try to create a real order
@@ -447,6 +466,7 @@ def update_portfolio(orders, last_price, volume):
             'volume': volume[coin],
             'stop_loss': -STOP_LOSS,
             'take_profit': TAKE_PROFIT,
+            'tp_sl_hit': False
             }
 
         # save the coins in a json file in the same directory
