@@ -43,13 +43,13 @@ trading_options:
   RECHECK_INTERVAL: 60
 
   # the difference in % between the first and second checks for the price.
-  CHANGE_IN_PRICE: 10
+  CHANGE_IN_PRICE: 8
 
   # define in % when to sell a coin that's not making a profit.
   STOP_LOSS: 5
   
   # define in % when to take profit on a profitable coin.
-  TAKE_PROFIT: 5
+  TAKE_PROFIT: 3
 
   # Use custom tickers.txt list for filtering pairs.
   CUSTOM_LIST: True
@@ -71,9 +71,9 @@ trading_options:
   SELL_STAGNATING_COIN: True
   SELL_STAGNATING_INTERVAL: 120
 
-  # Implement a second strategy that will sell a coin to make room for an extreme moonshot event
+  # Implement a strategy that will sell a coin to make room for an extreme moonshot event
   MOONSHOT: False
-  MOONSHOT_CHANGE_IN_PRICE: 20
+  MOONSHOT_CHANGE_IN_PRICE: 15
   
   # Options are Best, Worst, Random. Which coin to sacrifice to make room for Moonshot
   MOONSHOT_SACRIFICE: BEST 

@@ -22,6 +22,15 @@
 - Which coin to drop is configurable, either Best, Worst, or random (not sure why we would choose random)
 
 
+TODO -
+
+1. Signal Moonshot event
+- Probably can do it in the code that says "but you are holding max coins"
+2. Sell a coin
+- If moonshot is true, then we need to figure out which coin is "best", "worst", "random" (random picks the first coin and wtvr)
+
+
+
 
 
  

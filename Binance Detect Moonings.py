@@ -173,6 +173,14 @@ def wait_for_price():
                 if len(coins_bought) + len(volatile_coins) < MAX_COINS or MAX_COINS == 0:
                     volatile_coins[coin] = round(threshold_check, 3)
                     print(f'{coin} has gained {volatile_coins[coin]}% within the last {TIME_DIFFERENCE} minutes, calculating volume in {PAIR_WITH}')
+                    
+
+                # # track if coin is a moonshot. If so we want to make room for it
+                # if (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS is not 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
+                #     print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, making room for it.{txcolors.DEFAULT}')
+                #     # This is risky, because technically we'd have to add a new line to volatile_coins. If something goes wrong we risk investing more money than we have.
+                #     volatile_coins[coin] = round(threshold_check, 3)
+
 
                 else:
                     print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but you are holding max number of coins{txcolors.DEFAULT}')
@@ -376,9 +384,7 @@ def sell_coins():
             # if the coin has not reached a tp or a sl (implies the coin is stagnating) and sufficient time has passed since the coin purchase, we flag as stagnating coin
             if coins_bought[coin]['tp_sl_hit'] == False and (datetimeFromTimestamp < datetime.now() - timedelta(minutes=float(SELL_STAGNATING_INTERVAL))):
                 stagnating_coin = True
-                
-        
-        
+                  
         # define stop loss and take profit
         TP = float(coins_bought[coin]['bought_at']) + (float(coins_bought[coin]['bought_at']) * coins_bought[coin]['take_profit']) / 100
         SL = float(coins_bought[coin]['bought_at']) + (float(coins_bought[coin]['bought_at']) * coins_bought[coin]['stop_loss']) / 100
