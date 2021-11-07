@@ -15,22 +15,30 @@
 - If a certain time passes and you don't reach the TP, we give up on the coin. Time is configurable.
 
 
-## Drop Everything and MoonShot
+## Drop Everything and MoonShot - DONE
 
 - We need to receive signals from extreme moonshots, other than our normal checks
 - if a coin is going up EXTREMELY and we have hit MAX_COINS, we drop a coin and jump on the moonshot
-- Which coin to drop is configurable, either Best, Worst, or random (not sure why we would choose random)
+- Which coin to drop is configurable, either Best, Worst, else it picks a random one.
 
 
-TODO -
+## Always invest in stable coin - TODO
 
-1. Signal Moonshot event
-- Probably can do it in the code that says "but you are holding max coins"
-2. Sell a coin
-- If moonshot is true, then we need to figure out which coin is "best", "worst", "random" (random picks the first coin and wtvr)
+- We need to not let our funds go to waste and sit still
+- If no opportunities are found, we should hold one of the best performing coins from a pre-defined list, selecteed by a human
+- When the opportunity presents, we purchase the coin with the highest oscillators/technical indicators
+- If another opportunity presents itself, we should probably drop the stablecoin and make room? 
+- Easiest way to do this?
 
+We leverage signalsamplemod to print out the best coin from the bunch and write to separate file.
+Then if not max coins we can invest in it
 
+However the feature to make room is harder. We should leverage moonshot code for it
 
+If it says "max coins" then flag the coin and we are holding the stableCoin, say makeRoom = True?
 
+if makeRoom is true sell stableCoin (just loop through list and wtvr)
+
+then the next buy iteration remember coin and buy it? Idk. I just don't wanna miss a moonshot ever.
 
  

@@ -24,6 +24,7 @@ trading_options:
 
   # List of trading pairs to exclude
   # by default we're excluding the most popular fiat pairs
+
   FIATS:
     - EURUSDT
     - GBPUSDT
@@ -33,20 +34,20 @@ trading_options:
     - UP
 
   # Maximum number of trade 'slots' at any time (your USDT balance must be at least MAX_COINS * QUANTITY)
-  MAX_COINS: 4
+  MAX_COINS: 5
 
   # the amount of time in MINUTES to calculate the difference from the current price (minimum: 1).
   TIME_DIFFERENCE: 10
 
   # Number of times to check for TP/SL during each TIME_DIFFERENCE (minimum: 1).
   # Don't spam the Binance API, you will be banned (max 1200 requests per minute per IP).
-  RECHECK_INTERVAL: 60
+  RECHECK_INTERVAL: 30
 
   # the difference in % between the first and second checks for the price.
-  CHANGE_IN_PRICE: 5
+  CHANGE_IN_PRICE: 8
 
   # define in % when to sell a coin that's not making a profit.
-  STOP_LOSS: 3
+  STOP_LOSS: 5
   
   # define in % when to take profit on a profitable coin.
   TAKE_PROFIT: 2
@@ -62,20 +63,20 @@ trading_options:
 
   # when hit TAKE_PROFIT, move STOP_LOSS to TRAILING_STOP_LOSS percentage points below TAKE_PROFIT hence locking in profit
   # when hit TAKE_PROFIT, move TAKE_PROFIT up by TRAILING_TAKE_PROFIT percentage points
-  TRAILING_STOP_LOSS: 1
+  TRAILING_STOP_LOSS: 3
   TRAILING_TAKE_PROFIT: 1
   
 
   # Detect coins that are stagnating (i.e. price is too stable) and TP/SL are unlikely to be reached
   # Free up the space for better opportunities. Select the interval in minutes.
   SELL_STAGNATING_COIN: True
-  SELL_STAGNATING_INTERVAL: 120
+  SELL_STAGNATING_INTERVAL: 180
 
   # Implement a strategy that will sell a coin to make room for an extreme moonshot event
   MOONSHOT: True
-  MOONSHOT_CHANGE_IN_PRICE: 10
+  MOONSHOT_CHANGE_IN_PRICE: 15
   
-  # Options are BEST, WORST. Which coin to sacrifice to make room for Moonshot. Any other value will result in a random coin being sold.
+  # Options are Best, Worst. Which coin to sacrifice to make room for Moonshot. Any other value will result in a random coin being sold.
   MOONSHOT_SACRIFICE: 'WORST' 
 
   # Trading fee in % per trade.
