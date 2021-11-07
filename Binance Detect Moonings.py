@@ -155,9 +155,13 @@ def wait_for_price():
 
         threshold_check = (-1.0 if min_price[coin]['time'] > max_price[coin]['time'] else 1.0) * (float(max_price[coin]['price']) - float(min_price[coin]['price'])) / float(min_price[coin]['price']) * 100
 
+        
         # each coin with higher gains than our CHANGE_IN_PRICE is added to the volatile_coins dict if less than MAX_COINS is not reached.
         if threshold_check > CHANGE_IN_PRICE:
             coins_up +=1
+    
+            if DEBUG:
+                print(f"Coin: {coin}. Min Price: {min_price[coin]['time']} , Max Price: {max_price[coin]['time']}, Percent Change: {threshold_check} ")
 
             if coin not in volatility_cooloff:
                 volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE)
@@ -432,7 +436,7 @@ def sell_coins():
 
 def update_portfolio(orders, last_price, volume):
     '''add every coin bought to our portfolio for tracking/selling later'''
-    if DEBUG: print(orders)
+    if DEBUG and len(orders) > 1: print(orders)
     for coin in orders:
 
         coins_bought[coin] = {
@@ -485,7 +489,7 @@ if __name__ == '__main__':
     parsed_creds = load_config(creds_file)
 
     # Default no debugging
-    DEBUG = False
+    DEBUG = True
 
     # Load system vars
     TEST_MODE = parsed_config['script_options']['TEST_MODE']
@@ -511,6 +515,10 @@ if __name__ == '__main__':
     TRAILING_TAKE_PROFIT = parsed_config['trading_options']['TRAILING_TAKE_PROFIT']
     SELL_STAGNATING_COIN = parsed_config['trading_options']['SELL_STAGNATING_COIN']
     SELL_STAGNATING_INTERVAL = parsed_config['trading_options']['SELL_STAGNATING_INTERVAL']
+    MOONSHOT = parsed_config['trading_options']['MOONSHOT']
+    MOONSHOT_CHANGE_IN_PRICE = parsed_config['trading_options']['MOONSHOT_CHANGE_IN_PRICE']
+    MOONSHOT_SACRIFICE = parsed_config['trading_options']['MOONSHOT_SACRIFICE']
+    
     TRADING_FEE = parsed_config['trading_options']['TRADING_FEE']
     SIGNALLING_MODULES = parsed_config['trading_options']['SIGNALLING_MODULES']
     if DEBUG_SETTING or args.debug:
