@@ -187,7 +187,7 @@ def wait_for_price():
                     
 
                 # track if coin is a moonshot. If so we want to make room for it
-                if (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS is not 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
+                elif (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS is not 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
                     print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, will make room on next cycle.{txcolors.DEFAULT}')
                     moonshotEvent = True
                     moonshotCoin = coin
@@ -454,8 +454,9 @@ def sell_coins():
             coins_bought[coin]['tp_sl_hit'] = True
 
             # increasing TP by TRAILING_TAKE_PROFIT (essentially next time to readjust SL)
-            coins_bought[coin]['take_profit'] = PriceChange + TRAILING_TAKE_PROFIT
             coins_bought[coin]['stop_loss'] = coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS
+            coins_bought[coin]['take_profit'] = PriceChange + TRAILING_TAKE_PROFIT
+            
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
             continue
 
