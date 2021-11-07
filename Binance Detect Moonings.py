@@ -125,7 +125,7 @@ def wait_for_price():
     '''calls the initial price and ensures the correct amount of time has passed
     before reading the current price again'''
 
-    global historical_prices, hsp_head, volatility_cooloff
+    global historical_prices, hsp_head, volatility_cooloff, moonshotEvent, moonshotCoin
 
     volatile_coins = {}
     externals = {}
@@ -155,7 +155,17 @@ def wait_for_price():
 
         threshold_check = (-1.0 if min_price[coin]['time'] > max_price[coin]['time'] else 1.0) * (float(max_price[coin]['price']) - float(min_price[coin]['price'])) / float(min_price[coin]['price']) * 100
 
-        
+        # after a coin has been sacrificed for a moonshot, add the moonshotcoin to volatile_coins
+        if moonshotEvent and coin == moonshotCoin:
+
+            # add coin to volatile coin, proceed as normal
+            volatile_coins[coin] = round(threshold_check, 3)
+            print(f'{txcolors.WARNING} Made space for moonshot event {coin}. Preparing to buy.') 
+            
+            # reset variables for next moonshot event.
+            moonshotCoin = None
+            moonshotEvent = False
+
         # each coin with higher gains than our CHANGE_IN_PRICE is added to the volatile_coins dict if less than MAX_COINS is not reached.
         if threshold_check > CHANGE_IN_PRICE:
             coins_up +=1
@@ -170,16 +180,17 @@ def wait_for_price():
             if datetime.now() >= volatility_cooloff[coin] + timedelta(minutes=TIME_DIFFERENCE):
                 volatility_cooloff[coin] = datetime.now()
 
+                
                 if len(coins_bought) + len(volatile_coins) < MAX_COINS or MAX_COINS == 0:
                     volatile_coins[coin] = round(threshold_check, 3)
                     print(f'{coin} has gained {volatile_coins[coin]}% within the last {TIME_DIFFERENCE} minutes, calculating volume in {PAIR_WITH}')
                     
 
-                # # track if coin is a moonshot. If so we want to make room for it
-                # if (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS is not 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
-                #     print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, making room for it.{txcolors.DEFAULT}')
-                #     # This is risky, because technically we'd have to add a new line to volatile_coins. If something goes wrong we risk investing more money than we have.
-                #     volatile_coins[coin] = round(threshold_check, 3)
+                # track if coin is a moonshot. If so we want to make room for it
+                if (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS is not 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
+                    print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, will make room on next cycle.{txcolors.DEFAULT}')
+                    moonshotEvent = True
+                    moonshotCoin = coin
 
 
                 else:
@@ -366,13 +377,55 @@ def buy():
 def sell_coins():
     '''sell coins that have reached the STOP LOSS or TAKE PROFIT threshold'''
 
-    global hsp_head, session_profit
+    global hsp_head, session_profit, moonshotEvent
 
     last_price = get_price(False) # don't populate rolling window
     #last_price = get_price(add_to_historical=True) # don't populate rolling window
     coins_sold = {}
 
+
+    moonshotSacrifice = None
+    # if moonshotEvent has been detected, we flag the coin to sell based on the input logic
+    if moonshotEvent:
+        
+
+        PriceChange = None
+        
+        for coin in list(coins_bought):
+                        
+            LastPrice = float(last_price[coin]['price'])
+            BuyPrice = float(coins_bought[coin]['bought_at'])
+
+            if MOONSHOT_SACRIFICE == 'BEST':
+                
+                # initialize variable if not done yet
+                PriceChange = -100 if PriceChange is None else PriceChange
+
+                if(float((LastPrice - BuyPrice) / BuyPrice * 100) > PriceChange):
+                    PriceChange = float((LastPrice - BuyPrice) / BuyPrice * 100)
+                    moonshotSacrifice = coin
+
+            elif MOONSHOT_SACRIFICE == 'WORST':
+
+                # initialize variable if not done yet
+                PriceChange = 100 if PriceChange is None else PriceChange
+
+                if(float((LastPrice - BuyPrice) / BuyPrice * 100) < PriceChange):
+                    PriceChange = float((LastPrice - BuyPrice) / BuyPrice * 100)
+                    moonshotSacrifice = coin
+            
+            # pick a random coin if no preference is set
+            else:
+                    moonshotSacrifice = coin
+
+
     for coin in list(coins_bought):
+
+        sell_for_moonshot = False
+
+        if moonshotSacrifice == coin:
+
+            sell_for_moonshot = True
 
         stagnating_coin = False
         # check if stagnating coin setting is active
@@ -406,8 +459,10 @@ def sell_coins():
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
             continue
 
-        # check that the price is below the stop loss or above take profit (if trailing stop loss not used) and sell if this is the case. Also sell if coin is stagnating.
-        if LastPrice < SL or (LastPrice > TP and not USE_TRAILING_STOP_LOSS) or stagnating_coin:
+        # Check that the price is below the stop loss or above take profit (if trailing stop loss not used) and sell if this is the case.
+        # Sell if coin is stagnating.
+        # Sell if coin must make room for moonshot.
+        if LastPrice < SL or (LastPrice > TP and not USE_TRAILING_STOP_LOSS) or stagnating_coin or sell_for_moonshot:
 
             if LastPrice < SL:
                 print(f"{txcolors.SELL_PROFIT if PriceChange >= 0. else txcolors.SELL_LOSS}SL reached, selling {coins_bought[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} : {PriceChange-(TRADING_FEE*2):.2f}% Est:${(QUANTITY*(PriceChange-(TRADING_FEE*2)))/100:.2f}{txcolors.DEFAULT}")
@@ -417,6 +472,10 @@ def sell_coins():
 
             if(stagnating_coin):
                 print(f"{coin} has not hit SL or TP in {SELL_STAGNATING_INTERVAL} minutes. Coin is stagnating, preparing to sell {coins_bought[coin]['volume']} {coin}.")
+
+            if(sell_for_moonshot):
+                print(f"{coin} has been selected as a sacrifice to make room for moonshot. Preparing to sell {coins_bought[coin]['volume']} {coin}.")
+
 
 
             # try to create a real order
@@ -582,6 +641,12 @@ if __name__ == '__main__':
     # rolling window of prices; cyclical queue
     historical_prices = [None] * (TIME_DIFFERENCE * RECHECK_INTERVAL)
     hsp_head = -1
+
+    # adding flag for moonshotEvent
+    moonshotEvent = False
+
+    # name of moonshot coin
+    moonshotCoin = None
 
     # prevent including a coin in volatile_coins if it has already appeared there less than TIME_DIFFERENCE minutes ago
     volatility_cooloff = {}

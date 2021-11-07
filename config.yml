@@ -72,11 +72,11 @@ trading_options:
   SELL_STAGNATING_INTERVAL: 120
 
   # Implement a strategy that will sell a coin to make room for an extreme moonshot event
-  MOONSHOT: False
+  MOONSHOT: True
   MOONSHOT_CHANGE_IN_PRICE: 15
   
-  # Options are Best, Worst, Random. Which coin to sacrifice to make room for Moonshot
-  MOONSHOT_SACRIFICE: BEST 
+  # Options are Best, Worst. Which coin to sacrifice to make room for Moonshot. Any other value will result in a random coin being sold.
+  MOONSHOT_SACRIFICE: 'WORST' 
 
   # Trading fee in % per trade.
   # If using 0.75% (using BNB for fees) you must have BNB in your account to cover trading fees.
