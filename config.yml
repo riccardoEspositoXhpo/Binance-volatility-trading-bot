@@ -49,7 +49,7 @@ trading_options:
   STOP_LOSS: 2
   
   # define in % when to take profit on a profitable coin.
-  TAKE_PROFIT: 2
+  TAKE_PROFIT: 1
 
   # Use custom tickers.txt list for filtering pairs.
   CUSTOM_LIST: True
@@ -63,7 +63,7 @@ trading_options:
   # when hit TAKE_PROFIT, move STOP_LOSS to TRAILING_STOP_LOSS percentage points below TAKE_PROFIT hence locking in profit
   # when hit TAKE_PROFIT, move TAKE_PROFIT up by TRAILING_TAKE_PROFIT percentage points
   TRAILING_STOP_LOSS: 2
-  TRAILING_TAKE_PROFIT: 2
+  TRAILING_TAKE_PROFIT: 1
   
 
   # Detect coins that are stagnating (i.e. price is too stable) and TP/SL are unlikely to be reached
