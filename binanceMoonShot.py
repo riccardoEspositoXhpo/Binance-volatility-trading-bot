@@ -210,8 +210,6 @@ def wait_for_price():
     externals = external_signals(externalDir)
     exnumber = 0
     
-    strongDir = 'strong_performing_coins/'
-    strongPerformers = external_signals(strongDir)
 
 
     for excoin in externals:
@@ -222,14 +220,15 @@ def wait_for_price():
             print(f'External signal received on {excoin}, calculating volume in {PAIR_WITH}')
 
 
-    # Start checking for strong coins after initial interval
-    if datetime.now() - timedelta(minutes=STRONG_COIN_ACTIVATE) > startTime:
-        for strong in strongPerformers:
-            if strong not in volatile_coins and strong not in coins_bought and \
-                    (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS -1: #MAX_COINS - 1 implies we never fill our slots with strong
-                volatile_coins[strong] = 1
-                exnumber +=1
-                print(f'Space is available to invest in strong performing coin {strong}, calculating volume in {PAIR_WITH}')
+    # removing strong coins logic for now
+    # # Start checking for strong coins after initial interval
+    # if datetime.now() - timedelta(minutes=STRONG_COIN_ACTIVATE) > startTime:
+    #     for strong in strongPerformers:
+    #         if strong not in volatile_coins and strong not in coins_bought and \
+    #                 (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS -1: #MAX_COINS - 1 implies we never fill our slots with strong
+    #             volatile_coins[strong] = 1
+    #             exnumber +=1
+    #             print(f'Space is available to invest in strong performing coin {strong}, calculating volume in {PAIR_WITH}')
 
 
     return volatile_coins, len(volatile_coins), historical_prices[hsp_head]

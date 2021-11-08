@@ -15,18 +15,13 @@ MY_SECOND_INTERVAL = Interval.INTERVAL_5_MINUTES
 TA_BUY_THRESHOLD = 18 # How many of the 26 indicators to indicate a buy
 PAIR_WITH = 'USDT'
 TICKERS = 'tickers.txt'
-STRONG_PERFORMING_COINS = 'strong_performing_coins.txt'
-STRONG_WEIGHT_FIRST_INTERVAL = 0.6
-STRONG_WEIGHT_SECOND_INTERVAL = 0.4
+
 TIME_TO_WAIT = 5 # Minutes to wait between analysis
 FULL_LOG = False # List anylysis result to console
 
 def analyze(pairs):
     taMax = 0
     taMaxCoin = 'none'
-
-    strongTaMax = 0
-    strongTaMaxCoin = 'none'
 
     signal_coins = {}
     first_analysis = {}
@@ -35,15 +30,6 @@ def analyze(pairs):
     second_handler = {}
     if os.path.exists('signals/signalsample.exs'):
         os.remove('signals/signalsample.exs')
-
-    if os.path.exists('strong_performing_coins/signalsample.exs'):
-        os.remove('strong_performing_coins/signalsample.exs')
-
-    strong_pairs=[line.strip() for line in open(TICKERS)]
-    for line in open(STRONG_PERFORMING_COINS):
-        strong_pairs=[line.strip() + PAIR_WITH for line in open(STRONG_PERFORMING_COINS)] 
-    
-
 
     for pair in pairs:
         first_handler[pair] = TA_Handler(
@@ -82,15 +68,6 @@ def analyze(pairs):
         #else:
             #print(".", end = '')
 
-        # adding logic to find the strong pair amongst the largest coins 
-        if pair in strong_pairs:
-            # logic to weight the two intervals - weighing first 
-            strongIntervalSum = (STRONG_WEIGHT_FIRST_INTERVAL * first_tacheck) + (STRONG_WEIGHT_SECOND_INTERVAL * second_tacheck)
-
-            # Only consider coins that have at least a few indicators
-            if strongIntervalSum > strongTaMax and strongIntervalSum > (TA_BUY_THRESHOLD / 2):
-                    strongTaMax = strongIntervalSum
-                    strongTaMaxCoin = pair
 
         if first_tacheck > taMax:
                 taMax = first_tacheck
@@ -103,12 +80,6 @@ def analyze(pairs):
                     f.write(pair + '\n')
     print(f'Signalsample: Max signal by {taMaxCoin} at {taMax} on shortest timeframe') 
 
-    # write strong pairs in file if such pairs exist
-    if strongTaMax > 0:
-        with open('strong_performing_coins/signalsample.exs', 'a+') as f:
-            f.write(strongTaMaxCoin + '\n')
-    print(f'Signalsample: Strong Coin - Max signal by {strongTaMaxCoin} at {strongTaMax} on average of both timeframes')
-    
 
     return signal_coins
 

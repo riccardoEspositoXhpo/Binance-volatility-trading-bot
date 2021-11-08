@@ -1,6 +1,6 @@
 # Improvement Ideas - Enhancements from base version
 
-## PauseBotMod looks at multiple markets
+## PauseBotMod looks at multiple markets - DONE
 
 - pausebotmod can look at multiple currency markets, and will only pause if all markets are experiencing strong sell signals
 - This is done because the bitcoin price does not necessarily (or not necessarily alone) dictate how the other cryptos will move
