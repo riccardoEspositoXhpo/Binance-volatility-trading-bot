@@ -41,4 +41,17 @@ if makeRoom is true sell stableCoin (just loop through list and wtvr)
 
 then the next buy iteration remember coin and buy it? Idk. I just don't wanna miss a moonshot ever.
 
+
+## Volatility Cooloff Extension
+
+
+
+
+
+
+## Issues Log
+
+- Bot trades a security, it drops, it sells, then it goes up again, buys it again, essentially always buying high and selling low. to be fixed with Volatility Cooloff Extension, but need some more safeguards
+    - We could try to find positive changes in price but upwards trajectory too
+
  
