@@ -60,7 +60,12 @@ def do_work():
         if paused:
             with open('signals/paused.exc','a+') as f:
                 f.write('yes')
+            with open('strong_performing_coins/paused.exc','a+') as f:
+                f.write('yes')
         else:
+            if os.path.isfile("strong_performing_coins/paused.exc"):
+                os.remove('strong_performing_coins/paused.exc')
+                
             if os.path.isfile("signals/paused.exc"):
                 os.remove('signals/paused.exc')
                         

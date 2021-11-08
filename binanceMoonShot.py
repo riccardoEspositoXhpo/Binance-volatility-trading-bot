@@ -171,13 +171,13 @@ def wait_for_price():
             coins_up +=1
     
             if DEBUG:
-                print(f"Coin: {coin}. Min Price: {min_price[coin]['time']} , Max Price: {max_price[coin]['time']}, Percent Change: {threshold_check} ")
+                print(f"Coin: {coin}. Percent Change: {round(threshold_check,3)} ")
 
             if coin not in volatility_cooloff:
-                volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE)
+                volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE * 2)
 
-            # only include coin as volatile if it hasn't been picked up in the last TIME_DIFFERENCE minutes already
-            if datetime.now() >= volatility_cooloff[coin] + timedelta(minutes=TIME_DIFFERENCE):
+            # only include coin as volatile if it hasn't been picked up in the last two TIME_DIFFERENCE minute cycles
+            if datetime.now() >= volatility_cooloff[coin] + timedelta(minutes=TIME_DIFFERENCE * 2):
                 volatility_cooloff[coin] = datetime.now()
 
                 
@@ -187,7 +187,7 @@ def wait_for_price():
                     
 
                 # track if coin is a moonshot. If so we want to make room for it
-                elif (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS is not 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
+                elif (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS != 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
                     print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, will make room on next cycle.{txcolors.DEFAULT}')
                     moonshotEvent = True
                     moonshotCoin = coin
@@ -206,8 +206,13 @@ def wait_for_price():
     #print(f'Up: {coins_up} Down: {coins_down} Unchanged: {coins_unchanged}')
 
     # Here goes new code for external signalling
-    externals = external_signals()
+    externalDir = 'signals/'
+    externals = external_signals(externalDir)
     exnumber = 0
+    
+    strongDir = 'strong_performing_coins/'
+    strongPerformers = external_signals(strongDir)
+
 
     for excoin in externals:
         if excoin not in volatile_coins and excoin not in coins_bought and \
@@ -216,15 +221,26 @@ def wait_for_price():
             exnumber +=1
             print(f'External signal received on {excoin}, calculating volume in {PAIR_WITH}')
 
+
+    # Start checking for strong coins after initial interval
+    if datetime.now() - timedelta(minutes=STRONG_COIN_ACTIVATE) > startTime:
+        for strong in strongPerformers:
+            if strong not in volatile_coins and strong not in coins_bought and \
+                    (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS -1: #MAX_COINS - 1 implies we never fill our slots with strong
+                volatile_coins[strong] = 1
+                exnumber +=1
+                print(f'Space is available to invest in strong performing coin {strong}, calculating volume in {PAIR_WITH}')
+
+
     return volatile_coins, len(volatile_coins), historical_prices[hsp_head]
 
 
-def external_signals():
+def external_signals(dir):
     external_list = {}
     signals = {}
 
     # check directory and load pairs from files into external_list
-    signals = glob.glob("signals/*.exs")
+    signals = glob.glob( dir + "*.exs")
     for filename in signals:
         for line in open(filename):
             symbol = line.strip()
@@ -388,7 +404,6 @@ def sell_coins():
     # if moonshotEvent has been detected, we flag the coin to sell based on the input logic
     if moonshotEvent:
         
-
         PriceChange = None
         
         for coin in list(coins_bought):
@@ -453,8 +468,8 @@ def sell_coins():
             # Flag that tp or sl have been hit at least once. This indicates an upward trend in the coin, so we do not want to sell it.
             coins_bought[coin]['tp_sl_hit'] = True
 
-            # increasing TP by TRAILING_TAKE_PROFIT (essentially next time to readjust SL)
-            coins_bought[coin]['stop_loss'] = coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS
+            # Once TP is hit, we set TTP and TTSL as boundaries around the current priceLevel
+            coins_bought[coin]['stop_loss'] = PriceChange - TRAILING_STOP_LOSS
             coins_bought[coin]['take_profit'] = PriceChange + TRAILING_TAKE_PROFIT
             
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
@@ -562,6 +577,9 @@ if __name__ == '__main__':
     args = parse_args()
     mymodule = {}
 
+    # adding script start time
+    startTime = datetime.now()
+    print("Script Initialized. Welcome to Binance Moonshot.")
     # set to false at Start
     global bot_paused
     bot_paused = False
@@ -603,9 +621,11 @@ if __name__ == '__main__':
     SELL_STAGNATING_INTERVAL = parsed_config['trading_options']['SELL_STAGNATING_INTERVAL']
     MOONSHOT = parsed_config['trading_options']['MOONSHOT']
     MOONSHOT_CHANGE_IN_PRICE = parsed_config['trading_options']['MOONSHOT_CHANGE_IN_PRICE']
-    MOONSHOT_SACRIFICE = parsed_config['trading_options']['MOONSHOT_SACRIFICE']
-    
+    MOONSHOT_SACRIFICE = parsed_config['trading_options']['MOONSHOT_SACRIFICE']    
     TRADING_FEE = parsed_config['trading_options']['TRADING_FEE']
+    STRONG_COIN_ACTIVATE = parsed_config['trading_options']['STRONG_COIN_ACTIVATE']
+
+
     SIGNALLING_MODULES = parsed_config['trading_options']['SIGNALLING_MODULES']
     if DEBUG_SETTING or args.debug:
         DEBUG = True

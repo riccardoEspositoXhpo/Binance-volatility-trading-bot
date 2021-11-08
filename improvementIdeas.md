@@ -22,36 +22,21 @@
 - Which coin to drop is configurable, either Best, Worst, else it picks a random one.
 
 
-## Always invest in stable coin - TODO
+## Always invest in stable coin - DONE
 
 - We need to not let our funds go to waste and sit still
-- If no opportunities are found, we should hold one of the best performing coins from a pre-defined list, selecteed by a human
-- When the opportunity presents, we purchase the coin with the highest oscillators/technical indicators
-- If another opportunity presents itself, we should probably drop the stablecoin and make room? 
-- Easiest way to do this?
+- If no opportunities are found, we should hold one of the best performing coins from a pre-defined list, selected by a human
+- When the opportunity presents, we purchase the coin with the highest oscillators/technical indicators, continuously monitored
+- We only buy it after a certain time period (configurable) has passed and we still have room
+- We can only buy a stablecoin if that purchase would not take us to max coins
 
-We leverage signalsamplemod to print out the best coin from the bunch and write to separate file.
-Then if not max coins we can invest in it
+## Volatility Cooloff Extension - TODO
 
-However the feature to make room is harder. We should leverage moonshot code for it
-
-If it says "max coins" then flag the coin and we are holding the stableCoin, say makeRoom = True?
-
-if makeRoom is true sell stableCoin (just loop through list and wtvr)
-
-then the next buy iteration remember coin and buy it? Idk. I just don't wanna miss a moonshot ever.
-
-
-## Volatility Cooloff Extension
-
-
-
-
+- Extended the volatiliy cooloff to be twice the time interval in minutes
+- We could try to find positive changes in price but upwards trajectory too
 
 
 ## Issues Log
 
-- Bot trades a security, it drops, it sells, then it goes up again, buys it again, essentially always buying high and selling low. to be fixed with Volatility Cooloff Extension, but need some more safeguards
-    - We could try to find positive changes in price but upwards trajectory too
 
  
