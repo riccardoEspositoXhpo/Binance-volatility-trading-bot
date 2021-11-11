@@ -47,7 +47,7 @@ trading_options:
   CHANGE_IN_PRICE: 5
 
   # define in % when to sell a coin that's not making a profit.
-  STOP_LOSS: 3
+  STOP_LOSS: 5
   
   # define in % when to take profit on a profitable coin.
   TAKE_PROFIT: 2
@@ -63,14 +63,14 @@ trading_options:
 
   # when hit TAKE_PROFIT, move STOP_LOSS to TRAILING_STOP_LOSS percentage points below TAKE_PROFIT hence locking in profit
   # when hit TAKE_PROFIT, move TAKE_PROFIT up by TRAILING_TAKE_PROFIT percentage points
-  TRAILING_STOP_LOSS: 2
-  TRAILING_TAKE_PROFIT: 1
+  TRAILING_STOP_LOSS: 5
+  TRAILING_TAKE_PROFIT: 2
   
 
   # Detect coins that are stagnating (i.e. price is too stable) and TP/SL are unlikely to be reached
   # Free up the space for better opportunities. Select the interval in minutes.
   SELL_STAGNATING_COIN: True
-  SELL_STAGNATING_INTERVAL: 180
+  SELL_STAGNATING_INTERVAL: 300
 
   # Implement a strategy that will sell a coin to make room for an extreme moonshot event
   MOONSHOT: True

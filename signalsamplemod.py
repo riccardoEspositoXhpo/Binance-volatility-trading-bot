@@ -14,7 +14,7 @@ MY_FIRST_INTERVAL = Interval.INTERVAL_5_MINUTES
 MY_SECOND_INTERVAL = Interval.INTERVAL_15_MINUTES
 TA_BUY_THRESHOLD = 17 # How many of the 26 indicators to indicate a buy
 PAIR_WITH = 'USDT'
-TICKERS = 'tickers.txt'
+TICKERS = 'strong_performing_coins.txt'
 
 TIME_TO_WAIT = 5 # Minutes to wait between analysis
 FULL_LOG = False # List anylysis result to console
