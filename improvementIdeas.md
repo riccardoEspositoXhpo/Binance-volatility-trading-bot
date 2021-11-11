@@ -38,5 +38,24 @@
 
 ## Issues Log
 
+- Keeps buying the same coins over and over
+- keeps losing on the same coins
+- does not really capture long uptrends because the swings are too large
+- need to capture only coins who are trading above their moving average
+- need to allow for large price movements
+- need to let the coin grow and only then consolidate profit
+- somehow need to let big swings happen and only CLOSE DOWN the SL once we have made sufficient money, still maintaining some room for upside
+    - Like if I gained 50% I don't want to lose it, I can be satisfied with the trade and drop it you know
+
+    - How about flagging "number of times tp hit" so we can adjust logic every time with some map? Need to think about where configurations live though
+    - Add % at the end of the Coin: debug logic
+
+- the signalsamplemod is also checking on a short timeframe so if we want to test a longer timeframe must do it on both. which is annoying
+- Also wanna change pausebotmod to actually comptue the average of the 3 markets and set a min bound to consider "paused"
+
+
+
+
+
 
  
