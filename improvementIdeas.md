@@ -1,6 +1,6 @@
 # Improvement Ideas - Enhancements from base version
 
-## PauseBotMod looks at multiple markets - TODO
+## PauseBotMod looks at multiple markets - DONE
 
 - pausebotmod can look at multiple currency markets, and will only pause if all markets are experiencing strong sell signals
 - This is done because the bitcoin price does not necessarily (or not necessarily alone) dictate how the other cryptos will move
@@ -23,11 +23,19 @@
 
 ## Always invest in stable coin - TODO
 
+- Last priority, not sure if we want this.
+
+
 - We need to not let our funds go to waste and sit still
 - If no opportunities are found, we should hold one of the best performing coins from a pre-defined list, selected by a human
 - When the opportunity presents, we purchase the coin with the highest oscillators/technical indicators, continuously monitored
 - We only buy it after a certain time period (configurable) has passed and we still have room
 - We can only buy a stablecoin if that purchase would not take us to max coins
+
+## Adjust THRESHOLD logic to purchase coins - TODO
+
+- We want to purchase coins if price change is above threshold, but need to make sure that the bull run is not over and the price is on an upwards trajectory
+- To do this we confirm that the latest price is trading in some neighborhood of the max_price
 
 ## Volatility Cooloff Extension - DONE
 
@@ -38,24 +46,9 @@
 - Track the number of times the TP has been hit
 - If the number breaches a configurable threshold, tighten the SL to make sure we always end up with a gain
 
+## Custom Signal Mod
+
+- Configure custsignalmod to implement a trading strategy based on technical indicators
+- Strategy will be to look for coins trading above their EMA, with EMA10 > EMA longer periods
+
 ## Issues Log
-
-- Keeps buying the same coins over and over
-- keeps losing on the same coins
-- does not really capture long uptrends because the swings are too large
-- need to let the coin grow and only then consolidate profit
-- somehow need to let big swings happen and only CLOSE DOWN the SL once we have made sufficient money, still maintaining some room for upside
-- Like if I gained 50% I don't want to lose it, I can be satisfied with the trade and drop it you know
-
-- How about flagging "number of times tp hit" so we can adjust logic every time with some map? Need to think about where configurations live though
-- Add % at the end of the Coin: debug logic
-
-- the signalsamplemod is also checking on a short timeframe so if we want to test a longer timeframe must do it on both. which is annoying
-- Also wanna change pausebotmod to actually comptue the average of the 3 markets and set a min bound to consider "paused"
-
-
-# Trading Strategy
-
-- Buy coins based on price movement upwards
-- Buy coins based on technical indicators
-- Ability to split the two strategies
