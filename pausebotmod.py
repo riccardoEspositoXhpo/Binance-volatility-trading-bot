@@ -16,6 +16,9 @@ def analyze():
 
     paused = True
 
+    ma_sell = 0
+    average_ma_sell = 0
+
     for symbol in SYMBOLS:  
         analysis = {}
         handler = {}
@@ -34,17 +37,17 @@ def analyze():
             print("Exception:")
             print(e)
         
-        ma_sell = analysis.moving_averages['SELL']
-        if ma_sell >= THRESHOLD:
-            paused = paused and True
-        else:
-            paused = False
+        ma_sell += analysis.moving_averages['SELL']
+        
 
-
-    if paused:
+    average_ma_sell = ma_sell / len(SYMBOLS)
+    
+    if average_ma_sell >= THRESHOLD:
+        paused = True
         print(f'pausebotmod: Market not looking too good, bot paused from buying. Waiting {TIME_TO_WAIT} minutes for next market checkup.')
 
-    if not paused:    
+    if average_ma_sell < THRESHOLD:
+        paused = False    
         print(f'pausebotmod: Market looks ok, bot is running. Waiting {TIME_TO_WAIT} minutes for next market checkup.')
 
 
