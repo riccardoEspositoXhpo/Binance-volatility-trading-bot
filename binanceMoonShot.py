@@ -141,7 +141,7 @@ def wait_for_price():
         # sleep for exactly the amount of time required
         time.sleep((timedelta(minutes=float(TIME_DIFFERENCE / RECHECK_INTERVAL)) - (datetime.now() - historical_prices[hsp_head]['BNB' + PAIR_WITH]['time'])).total_seconds())
 
-    print(f'Working...Session profit:{session_profit:.2f}% Est:${(QUANTITY * session_profit)/100:.2f}')
+    print(f'Working...Session profit:{session_profit:.2f}% Amount:${(QUANTITY * session_profit)/100:.2f}')
 
     # retreive latest prices
     get_price()
@@ -181,6 +181,7 @@ def wait_for_price():
                 volatility_cooloff[coin] = datetime.now()
 
                 
+                # TODO - only invest up to max_coins/2 so we can split strategies?
                 if len(coins_bought) + len(volatile_coins) < MAX_COINS or MAX_COINS == 0:
                     volatile_coins[coin] = round(threshold_check, 3)
                     print(f'{coin} has gained {volatile_coins[coin]}% within the last {TIME_DIFFERENCE} minutes, calculating volume in {PAIR_WITH}')
@@ -202,33 +203,19 @@ def wait_for_price():
         else:
             coins_unchanged +=1
 
-    # Disabled until fix
-    #print(f'Up: {coins_up} Down: {coins_down} Unchanged: {coins_unchanged}')
 
     # Here goes new code for external signalling
     externalDir = 'signals/'
     externals = external_signals(externalDir)
     exnumber = 0
     
-
-
+    # TODO - only invest until max_coins / 2 so we can split strategies?
     for excoin in externals:
         if excoin not in volatile_coins and excoin not in coins_bought and \
                 (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS:
             volatile_coins[excoin] = 1
             exnumber +=1
             print(f'External signal received on {excoin}, calculating volume in {PAIR_WITH}')
-
-
-    # removing strong coins logic for now
-    # # Start checking for strong coins after initial interval
-    # if datetime.now() - timedelta(minutes=STRONG_COIN_ACTIVATE) > startTime:
-    #     for strong in strongPerformers:
-    #         if strong not in volatile_coins and strong not in coins_bought and \
-    #                 (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS -1: #MAX_COINS - 1 implies we never fill our slots with strong
-    #             volatile_coins[strong] = 1
-    #             exnumber +=1
-    #             print(f'Space is available to invest in strong performing coin {strong}, calculating volume in {PAIR_WITH}')
 
 
     return volatile_coins, len(volatile_coins), historical_prices[hsp_head]
@@ -449,7 +436,7 @@ def sell_coins():
             datetimeFromTimestamp = datetime.fromtimestamp(coins_bought[coin]['timestamp'])
 
             # if the coin has not reached a tp or a sl (implies the coin is stagnating) and sufficient time has passed since the coin purchase, we flag as stagnating coin
-            if coins_bought[coin]['tp_sl_hit'] == False and (datetimeFromTimestamp < datetime.now() - timedelta(minutes=float(SELL_STAGNATING_INTERVAL))):
+            if coins_bought[coin]['tp_sl_hit'] == 0 and (datetimeFromTimestamp < datetime.now() - timedelta(minutes=float(SELL_STAGNATING_INTERVAL))):
                 stagnating_coin = True
                   
         # define stop loss and take profit
@@ -464,14 +451,25 @@ def sell_coins():
         # check that the price is above the take profit and readjust SL and TP accordingly if trialing stop loss used
         if LastPrice > TP and USE_TRAILING_STOP_LOSS:
 
-            # Flag that tp or sl have been hit at least once. This indicates an upward trend in the coin, so we do not want to sell it.
-            coins_bought[coin]['tp_sl_hit'] = True
-
-            # Once TP is hit, we set TTP and TTSL as boundaries around the current priceLevel
-            coins_bought[coin]['stop_loss'] = PriceChange - TRAILING_STOP_LOSS
-            coins_bought[coin]['take_profit'] = PriceChange + TRAILING_TAKE_PROFIT
+            # Once TP is hit, we set TTP and TTSL as boundaries around the current TP level
+            if coins_bought[coin]['tp_sl_hit'] < TP_HIT_COUNT_LOCK_IN:
+                coins_bought[coin]['stop_loss'] = TP - TRAILING_STOP_LOSS
             
+            # if TP has been hit TRAILING_STOP_LOSS_LOCK times, we tighten the boundary around the TP
+            else:
+                coins_bought[coin]['stop_loss'] = TP - TRAILING_STOP_LOSS_LOCK
+                if DEBUG: print(f"{coin} TP reached at least {TP_HIT_COUNT_LOCK_IN} times, SL set to {TP - TRAILING_STOP_LOSS_LOCK} instead of {TP - TRAILING_STOP_LOSS}")
+
+    
+            coins_bought[coin]['take_profit'] = TP + TRAILING_TAKE_PROFIT
+
+            # Flag that tp or sl have been hit at least once. This indicates an upward trend in the coin, so we do not want to sell it.
+            coins_bought[coin]['tp_sl_hit'] += 1
+
+
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
+
+
             continue
 
         # Check that the price is below the stop loss or above take profit (if trailing stop loss not used) and sell if this is the case.
@@ -546,7 +544,7 @@ def update_portfolio(orders, last_price, volume):
             'volume': volume[coin],
             'stop_loss': -STOP_LOSS,
             'take_profit': TAKE_PROFIT,
-            'tp_sl_hit': False
+            'tp_sl_hit': 0
             }
 
         # save the coins in a json file in the same directory
@@ -616,13 +614,15 @@ if __name__ == '__main__':
     USE_TRAILING_STOP_LOSS = parsed_config['trading_options']['USE_TRAILING_STOP_LOSS']
     TRAILING_STOP_LOSS = parsed_config['trading_options']['TRAILING_STOP_LOSS']
     TRAILING_TAKE_PROFIT = parsed_config['trading_options']['TRAILING_TAKE_PROFIT']
+    TP_HIT_COUNT_LOCK_IN = parsed_config['trading_options']['TP_HIT_COUNT_LOCK_IN']
+    TRAILING_STOP_LOSS_LOCK = parsed_config['trading_options']['TRAILING_STOP_LOSS_LOCK']
     SELL_STAGNATING_COIN = parsed_config['trading_options']['SELL_STAGNATING_COIN']
     SELL_STAGNATING_INTERVAL = parsed_config['trading_options']['SELL_STAGNATING_INTERVAL']
     MOONSHOT = parsed_config['trading_options']['MOONSHOT']
     MOONSHOT_CHANGE_IN_PRICE = parsed_config['trading_options']['MOONSHOT_CHANGE_IN_PRICE']
     MOONSHOT_SACRIFICE = parsed_config['trading_options']['MOONSHOT_SACRIFICE']    
     TRADING_FEE = parsed_config['trading_options']['TRADING_FEE']
-    STRONG_COIN_ACTIVATE = parsed_config['trading_options']['STRONG_COIN_ACTIVATE']
+
 
 
     SIGNALLING_MODULES = parsed_config['trading_options']['SIGNALLING_MODULES']

@@ -11,7 +11,7 @@
 
 - After coins have been bought, they could stagnate, preventing us from buying real moonshots
 - The bot could keep them together if they stay between the original SL and TP
-- we add 'tp_sl_hit' = False to the coins_bought dict
+- we add 'tp_sl_hit' = 0 to the coins_bought dict
 - We code an optional mode where we check if a coin has NEVER breached the TP (don't need to check the SL because if not it would be sold already)
 - If a certain time passes and you don't reach the TP, we give up on the coin. Time is configurable.
 
@@ -33,13 +33,16 @@
 
 - Extended the volatiliy cooloff to be twice the time interval in minutes
 
+## Consolidate Profit - DONE
+
+- Track the number of times the TP has been hit
+- If the number breaches a configurable threshold, tighten the SL to make sure we always end up with a gain
+
 ## Issues Log
 
 - Keeps buying the same coins over and over
 - keeps losing on the same coins
 - does not really capture long uptrends because the swings are too large
-- need to capture only coins who are trading above their moving average
-- need to allow for large price movements
 - need to let the coin grow and only then consolidate profit
 - somehow need to let big swings happen and only CLOSE DOWN the SL once we have made sufficient money, still maintaining some room for upside
 - Like if I gained 50% I don't want to lose it, I can be satisfied with the trade and drop it you know
