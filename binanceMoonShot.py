@@ -155,6 +155,10 @@ def wait_for_price():
 
         threshold_check = (-1.0 if min_price[coin]['time'] > max_price[coin]['time'] else 1.0) * (float(max_price[coin]['price']) - float(min_price[coin]['price'])) / float(min_price[coin]['price']) * 100
 
+
+        # discover is historical_prices[hsp_head] has latest price. Check if it is in some neighborhood of max_prcie!
+        
+
         # after a coin has been sacrificed for a moonshot, add the moonshotcoin to volatile_coins
         if moonshotEvent and coin == moonshotCoin:
 
@@ -167,11 +171,12 @@ def wait_for_price():
             moonshotEvent = False
 
         # each coin with higher gains than our CHANGE_IN_PRICE is added to the volatile_coins dict if less than MAX_COINS is not reached.
-        if threshold_check > CHANGE_IN_PRICE:
+        # also detect if the coin's latest price is within some % of the max_price - set at 1 by default
+        if threshold_check > CHANGE_IN_PRICE and historical_prices[hsp_head][coin]['price'] >= (100 - 1) * max_price[coin]['price'] / 100:
             coins_up +=1
     
             if DEBUG:
-                print(f"Coin: {coin}. Percent Change: {round(threshold_check,3)} ")
+                print(f"Coin: {coin}. Percent Change: {round(threshold_check,3)}%")
 
             if coin not in volatility_cooloff:
                 volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE * 2)
@@ -196,6 +201,12 @@ def wait_for_price():
 
                 else:
                     print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but you are holding max number of coins{txcolors.DEFAULT}')
+
+
+        # coin has gained but we do not detect an upwards trend
+        elif threshold_check > CHANGE_IN_PRICE:
+            coins_up += 1
+            print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but we detect a downwards trend in momentum{txcolors.DEFAULT}')
 
         elif threshold_check < CHANGE_IN_PRICE:
             coins_down +=1
