@@ -62,7 +62,7 @@ class txcolors:
     WARNING = '\033[93m'
     SELL_LOSS = '\033[91m'
     SELL_PROFIT = '\033[32m'
-    DIM = '\033[2m\033[35m'
+    DIM = '\033[39m\033[35m'
     DEFAULT = '\033[39m'
 
 
@@ -171,8 +171,8 @@ def wait_for_price():
             moonshotEvent = False
 
         # each coin with higher gains than our CHANGE_IN_PRICE is added to the volatile_coins dict if less than MAX_COINS is not reached.
-        # also detect if the coin's latest price is within some % of the max_price - set at 1 by default
-        if threshold_check > CHANGE_IN_PRICE and historical_prices[hsp_head][coin]['price'] >= (100 - 1) * max_price[coin]['price'] / 100:
+        # also detect if the coin's latest price is trading with an upwards momentum
+        if threshold_check > CHANGE_IN_PRICE: #and float(historical_prices[hsp_head][coin]['price']) >= (100 - 1) * float(max_price[coin]['price']) / 100:
             coins_up +=1
     
             if DEBUG:
@@ -186,7 +186,6 @@ def wait_for_price():
                 volatility_cooloff[coin] = datetime.now()
 
                 
-                # TODO - only invest up to max_coins/2 so we can split strategies?
                 if len(coins_bought) + len(volatile_coins) < MAX_COINS or MAX_COINS == 0:
                     volatile_coins[coin] = round(threshold_check, 3)
                     print(f'{coin} has gained {volatile_coins[coin]}% within the last {TIME_DIFFERENCE} minutes, calculating volume in {PAIR_WITH}')

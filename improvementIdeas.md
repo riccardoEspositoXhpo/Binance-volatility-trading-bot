@@ -24,9 +24,8 @@
 ## Adjust THRESHOLD logic to purchase coins - DONE
 
 - We want to purchase coins if price change is above threshold, but need to make sure that the bull run is not over and the price is on an upwards trajectory
-- To do this we confirm that the latest price is trading in some neighborhood of the max_price
+- To do this we confirm that the latest price is close to the peak
 - We would like to avoid looking for a 5% increase in price, but the coin has actually gained 8% and already dropped 3%
-
 
 ## Volatility Cooloff Extension - DONE
 
@@ -37,10 +36,16 @@
 - Track the number of times the TP has been hit
 - If the number breaches a configurable threshold, tighten the SL to make sure we always end up with a gain
 
+## Update Ticker Mod - DONE
+
+- Module scans binance for all trading pairs ending in PAIR_WITH and not in EXCLUDE coin list
+- For every coin not in existing ticker list, tries to retrieve analysis to ensure coin works
+- Adds coin to ticker list
+- Suggested not to run this more than once per day
+
 ## Custom Signal Mod - TODO
 
 - Configure custsignalmod to implement a trading strategy based on technical indicators
 - Strategy desc goes here
-
 
 ## Issues Log

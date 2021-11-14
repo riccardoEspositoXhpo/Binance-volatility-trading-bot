@@ -26,9 +26,9 @@ trading_options:
   # by default we're excluding the most popular fiat pairs
 
   EXCLUDE:
-    - EURUSDT
-    - GBPUSDT
-    - JPYUSDT
+    - EUR
+    - GBP
+    - JPY
     - USDUSDT
     - DOWN
     - UP
@@ -44,6 +44,7 @@ trading_options:
     - BRL
     - RUB
     - ZAR
+    - AUD
 
   # Maximum number of trade 'slots' at any time (your USDT balance must be at least MAX_COINS * QUANTITY)
   MAX_COINS: 5

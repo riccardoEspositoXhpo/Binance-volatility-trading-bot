@@ -83,7 +83,7 @@ def analyze(current_tickers):
                 print(f'Updateticker: Ticker {ticker} not in ticker list. Adding to list.')
             
             except Exception as e:
-                    print(f"Updateticker: Ticker {ticker} exists and not in list but not retrievable via TA_handler")
+                    if FULL_LOG: print(f"Updateticker: Ticker {ticker} exists and not in list but not retrievable via TA_handler")
         
     # plural day handling
     s = ''
