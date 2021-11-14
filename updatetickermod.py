@@ -34,6 +34,11 @@ CUSTOM_LIST = parsed_config['trading_options']['CUSTOM_LIST']
 TICKERS = parsed_config['trading_options']['TICKERS_LIST']
 EXCLUDE = parsed_config['trading_options']['EXCLUDE']
 
+# handler variables
+MY_EXCHANGE = 'BINANCE'
+MY_SCREENER = 'CRYPTO'
+INTERVAL = Interval.INTERVAL_5_MINUTES
+
 # Load creds for correct environment
 access_key, secret_key = load_correct_creds(parsed_creds)
 
@@ -59,12 +64,27 @@ def analyze(current_tickers):
 
     for ticker in tickers:
         if ticker not in current_tickers:
-            print(f'Updateticker: Ticker {ticker} not in ticker list. Adding to list.')
+            
+            handler = TA_Handler(
+                symbol=ticker,
+                exchange=MY_EXCHANGE,
+                screener=MY_SCREENER,
+                interval=INTERVAL,
+                timeout= 10
+            )
 
-            symbol = ticker.replace(PAIR_WITH, '')
-            with open(TICKERS, 'a+') as f:
-                f.write('\n' + symbol)
-    
+            try: 
+                test_analysis = handler.get_analysis()
+
+                symbol = ticker.replace(PAIR_WITH, '')
+                with open(TICKERS, 'a+') as f:
+                    f.write('\n' + symbol)
+                                
+                print(f'Updateticker: Ticker {ticker} not in ticker list. Adding to list.')
+            
+            except Exception as e:
+                    print(f"Updateticker: Ticker {ticker} exists and not in list but not retrievable via TA_handler")
+        
     # plural day handling
     s = ''
     if TIME_TO_WAIT > 1: s = 's'
