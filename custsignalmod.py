@@ -82,3 +82,9 @@ def do_work():
         signal_coins = analyze(pairs)
         print(f'Custsignalmod: {len(signal_coins)} coins above {OSC_THRESHOLD}/{len(OSC_INDICATORS)} oscillators and {MA_THRESHOLD}/{len(MA_INDICATORS)} moving averages Waiting {TIME_TO_WAIT} minutes for next analysis.')
         time.sleep((TIME_TO_WAIT*60))
+
+
+# testing
+if __name__ == '__main__':
+    do_work()
+
