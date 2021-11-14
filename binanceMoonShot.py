@@ -460,21 +460,20 @@ def sell_coins():
         # check that the price is above the take profit and readjust SL and TP accordingly if trialing stop loss used
         if LastPrice > TP and USE_TRAILING_STOP_LOSS:
 
-            # Once TP is hit, we set TTP and TTSL as boundaries around the current TP level
-            if coins_bought[coin]['tp_sl_hit'] < TP_HIT_COUNT_LOCK_IN:
-                coins_bought[coin]['stop_loss'] = TP - TRAILING_STOP_LOSS
-            
-            # if TP has been hit TRAILING_STOP_LOSS_LOCK times, we tighten the boundary around the TP
-            else:
-                coins_bought[coin]['stop_loss'] = TP - TRAILING_STOP_LOSS_LOCK
-                if DEBUG: print(f"{coin} TP reached at least {TP_HIT_COUNT_LOCK_IN} times, SL set to {(TP - TRAILING_STOP_LOSS_LOCK):.2f} instead of {(TP - TRAILING_STOP_LOSS):.2f}")
-
-    
             coins_bought[coin]['take_profit'] = TP + TRAILING_TAKE_PROFIT
 
             # Flag that tp or sl have been hit at least once. This indicates an upward trend in the coin, so we do not want to sell it.
             coins_bought[coin]['tp_sl_hit'] += 1
 
+            # Once TP is hit, we set TTP and TTSL as boundaries around the current TP level
+            if coins_bought[coin]['tp_sl_hit'] <= TP_HIT_COUNT_LOCK_IN:
+                coins_bought[coin]['stop_loss'] = coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS
+            
+            # if TP has been hit TRAILING_STOP_LOSS_LOCK times, we tighten the boundary around the TP
+            else:
+                coins_bought[coin]['stop_loss'] = coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS_LOCK
+                if DEBUG: print(f"{coin} TP reached at least {TP_HIT_COUNT_LOCK_IN} times, SL set to {(coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS_LOCK):.2f} instead of {(coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS):.2f}")
+           
 
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
 
