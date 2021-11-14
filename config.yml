@@ -25,13 +25,25 @@ trading_options:
   # List of trading pairs to exclude
   # by default we're excluding the most popular fiat pairs
 
-  FIATS:
+  EXCLUDE:
     - EURUSDT
     - GBPUSDT
     - JPYUSDT
     - USDUSDT
     - DOWN
     - UP
+    - BULL
+    - BEAR
+    - USDC
+    - USDP
+    - USDS
+    - BUSDUSDT
+    - DAI 
+    - USDSB
+    - TRY
+    - BRL
+    - RUB
+    - ZAR
 
   # Maximum number of trade 'slots' at any time (your USDT balance must be at least MAX_COINS * QUANTITY)
   MAX_COINS: 5
@@ -90,7 +102,9 @@ trading_options:
 
   
   SIGNALLING_MODULES:
+    - updatetickermod
     - pausebotmod
     - signalsamplemod 
+
     
   

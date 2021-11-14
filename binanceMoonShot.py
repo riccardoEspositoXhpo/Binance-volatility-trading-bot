@@ -104,10 +104,10 @@ def get_price(add_to_historical=True):
     for coin in prices:
 
         if CUSTOM_LIST:
-            if any(item + PAIR_WITH == coin['symbol'] for item in tickers) and all(item not in coin['symbol'] for item in FIATS):
+            if any(item + PAIR_WITH == coin['symbol'] for item in tickers) and all(item not in coin['symbol'] for item in EXCLUDE):
                 initial_price[coin['symbol']] = { 'price': coin['price'], 'time': datetime.now()}
         else:
-            if PAIR_WITH in coin['symbol'] and all(item not in coin['symbol'] for item in FIATS):
+            if PAIR_WITH in coin['symbol'] and all(item not in coin['symbol'] for item in EXCLUDE):
                 initial_price[coin['symbol']] = { 'price': coin['price'], 'time': datetime.now()}
 
     if add_to_historical:
@@ -220,7 +220,6 @@ def wait_for_price():
     externals = external_signals(externalDir)
     exnumber = 0
     
-    # TODO - only invest until max_coins / 2 so we can split strategies?
     for excoin in externals:
         if excoin not in volatile_coins and excoin not in coins_bought and \
                 (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS:
@@ -469,7 +468,7 @@ def sell_coins():
             # if TP has been hit TRAILING_STOP_LOSS_LOCK times, we tighten the boundary around the TP
             else:
                 coins_bought[coin]['stop_loss'] = TP - TRAILING_STOP_LOSS_LOCK
-                if DEBUG: print(f"{coin} TP reached at least {TP_HIT_COUNT_LOCK_IN} times, SL set to {TP - TRAILING_STOP_LOSS_LOCK} instead of {TP - TRAILING_STOP_LOSS}")
+                if DEBUG: print(f"{coin} TP reached at least {TP_HIT_COUNT_LOCK_IN} times, SL set to {(TP - TRAILING_STOP_LOSS_LOCK):.2f} instead of {(TP - TRAILING_STOP_LOSS):.2f}")
 
     
             coins_bought[coin]['take_profit'] = TP + TRAILING_TAKE_PROFIT
@@ -614,7 +613,7 @@ if __name__ == '__main__':
     PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
     QUANTITY = parsed_config['trading_options']['QUANTITY']
     MAX_COINS = parsed_config['trading_options']['MAX_COINS']
-    FIATS = parsed_config['trading_options']['FIATS']
+    EXCLUDE = parsed_config['trading_options']['EXCLUDE']
     TIME_DIFFERENCE = parsed_config['trading_options']['TIME_DIFFERENCE']
     RECHECK_INTERVAL = parsed_config['trading_options']['RECHECK_INTERVAL']
     CHANGE_IN_PRICE = parsed_config['trading_options']['CHANGE_IN_PRICE']

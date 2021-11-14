@@ -21,21 +21,12 @@
 - if a coin is going up EXTREMELY and we have hit MAX_COINS, we drop a coin and jump on the moonshot
 - Which coin to drop is configurable, either Best, Worst, else it picks a random one.
 
-## Always invest in stable coin - TODO
-
-- Last priority, not sure if we want this.
-
-
-- We need to not let our funds go to waste and sit still
-- If no opportunities are found, we should hold one of the best performing coins from a pre-defined list, selected by a human
-- When the opportunity presents, we purchase the coin with the highest oscillators/technical indicators, continuously monitored
-- We only buy it after a certain time period (configurable) has passed and we still have room
-- We can only buy a stablecoin if that purchase would not take us to max coins
-
-## Adjust THRESHOLD logic to purchase coins - TODO
+## Adjust THRESHOLD logic to purchase coins - DONE
 
 - We want to purchase coins if price change is above threshold, but need to make sure that the bull run is not over and the price is on an upwards trajectory
 - To do this we confirm that the latest price is trading in some neighborhood of the max_price
+- We would like to avoid looking for a 5% increase in price, but the coin has actually gained 8% and already dropped 3%
+
 
 ## Volatility Cooloff Extension - DONE
 
@@ -46,9 +37,10 @@
 - Track the number of times the TP has been hit
 - If the number breaches a configurable threshold, tighten the SL to make sure we always end up with a gain
 
-## Custom Signal Mod
+## Custom Signal Mod - TODO
 
 - Configure custsignalmod to implement a trading strategy based on technical indicators
-- Strategy will be to look for coins trading above their EMA, with EMA10 > EMA longer periods
+- Strategy desc goes here
+
 
 ## Issues Log
