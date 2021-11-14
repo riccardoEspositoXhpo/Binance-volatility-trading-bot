@@ -10,17 +10,15 @@ import glob
 import time
 import threading
 
-OSC_INDICATORS = ['MACD', 'Stoch.RSI', 'Mom'] # Indicators to use in Oscillator analysis
-OSC_THRESHOLD = 2 # Must be less or equal to number of items in OSC_INDICATORS 
-MA_INDICATORS = ['EMA10', 'EMA20'] # Indicators to use in Moving averages analysis
-MA_THRESHOLD = 2 # Must be less or equal to number of items in MA_INDICATORS 
+# Indicators to use in Technical Analysis
+INDICATORS = ['EMA5', 'EMA10', 'EMA20', 'EMA30', 'RSI', 'ADX', 'ADX+DI', 'ADX-DI', 'MACD.macd', 'MACD.signal', 'HullMA9']
 INTERVAL = Interval.INTERVAL_5_MINUTES #Timeframe for analysis
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
 PAIR_WITH = 'USDT'
 TICKERS = 'tickers.txt'
-TIME_TO_WAIT = 4 # Minutes to wait between analysis
+TIME_TO_WAIT = 2 # Minutes to wait between analysis
 FULL_LOG = False # List analysis result to console
 
 def analyze(pairs):
@@ -49,18 +47,11 @@ def analyze(pairs):
             print (f'Coin: {pair}')
             print (f'handler: {handler[pair]}')
 
-        oscCheck=0
-        maCheck=0
-        for indicator in OSC_INDICATORS:
-            if analysis.oscillators ['COMPUTE'][indicator] == 'BUY': oscCheck +=1
-      	
-        for indicator in MA_INDICATORS:
-            if analysis.moving_averages ['COMPUTE'][indicator] == 'BUY': maCheck +=1		
 
         if FULL_LOG:
             print(f'Custsignalmod:{pair} Oscillators:{oscCheck}/{len(OSC_INDICATORS)} Moving averages:{maCheck}/{len(MA_INDICATORS)}')
         
-        if oscCheck >= OSC_THRESHOLD and maCheck >= MA_THRESHOLD:
+        if True:
                 signal_coins[pair] = pair
                 print(f'Custsignalmod: Signal detected on {pair} at {oscCheck}/{len(OSC_INDICATORS)} oscillators and {maCheck}/{len(MA_INDICATORS)} moving averages.')
                 with open('signals/custsignalmod.exs','a+') as f:
@@ -80,7 +71,7 @@ def do_work():
         if not threading.main_thread().is_alive(): exit()
         print(f'Custsignalmod: Analyzing {len(pairs)} coins')
         signal_coins = analyze(pairs)
-        print(f'Custsignalmod: {len(signal_coins)} coins above {OSC_THRESHOLD}/{len(OSC_INDICATORS)} oscillators and {MA_THRESHOLD}/{len(MA_INDICATORS)} moving averages Waiting {TIME_TO_WAIT} minutes for next analysis.')
+        print(f'Custsignalmod: {len(signal_coins)} coins above moving averages. Waiting {TIME_TO_WAIT} minutes for next analysis.')
         time.sleep((TIME_TO_WAIT*60))
 
 
@@ -88,3 +79,8 @@ def do_work():
 if __name__ == '__main__':
     do_work()
 
+# start script
+# run analysis on some timeframe
+# flag potential buys statically in some file (like test_coins_bought.json tipo)
+# re-run analysis a second time
+# drop a signal on a coin that was present both times
