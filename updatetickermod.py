@@ -55,8 +55,6 @@ def analyze(current_tickers):
     raw_tickers = client.get_all_tickers()
     
     tickers = []
-    
-    print(raw_tickers)
 
     for raw_ticker in raw_tickers:
 
@@ -112,8 +110,4 @@ def do_work():
 
         analyze(current_tickers)
 
-
         time.sleep((TIME_TO_WAIT*60*60*24))
-
-
-do_work()
