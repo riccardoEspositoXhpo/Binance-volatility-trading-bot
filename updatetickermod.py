@@ -55,6 +55,8 @@ def analyze(current_tickers):
     raw_tickers = client.get_all_tickers()
     
     tickers = []
+    
+    print(raw_tickers)
 
     for raw_ticker in raw_tickers:
 
@@ -63,6 +65,7 @@ def analyze(current_tickers):
     
 
     for ticker in tickers:
+
         if ticker not in current_tickers:
             
             handler = TA_Handler(
@@ -112,3 +115,5 @@ def do_work():
 
         time.sleep((TIME_TO_WAIT*60*60*24))
 
+
+do_work()
