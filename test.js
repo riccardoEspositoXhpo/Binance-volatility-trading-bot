@@ -40,4 +40,3 @@ var indicators = {
 
 
 */
-
