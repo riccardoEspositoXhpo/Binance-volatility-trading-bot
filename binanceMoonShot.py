@@ -204,7 +204,7 @@ def wait_for_price():
             
             # technical analysis has failed
             else:
-                print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but the technical analysis has failed.{txcolors.DEFAULT}')
+                print(f'{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but the technical analysis has failed.{txcolors.DEFAULT}')
 
         # coin has gained but we do not detect an upwards trend
         elif threshold_check > CHANGE_IN_PRICE:
