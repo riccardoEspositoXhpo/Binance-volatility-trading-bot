@@ -55,6 +55,7 @@ from helpers.handle_creds import (
     load_correct_creds, test_api_key
 )
 
+from technical_analysis import technical_analysis
 
 # for colourful logging to the console
 class txcolors:
@@ -172,35 +173,42 @@ def wait_for_price():
 
         # each coin with higher gains than our CHANGE_IN_PRICE is added to the volatile_coins dict if less than MAX_COINS is not reached.
         # also detect if the coin's latest price is trading with an upwards momentum
-        if threshold_check > CHANGE_IN_PRICE: #and float(historical_prices[hsp_head][coin]['price']) >= (100 - 1) * float(max_price[coin]['price']) / 100:
+        if threshold_check > CHANGE_IN_PRICE:
             coins_up +=1
     
+
             if DEBUG:
                 print(f"Coin: {coin}. Percent Change: {round(threshold_check,3)}%")
 
-            if coin not in volatility_cooloff:
-                volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE * 2)
+            # run technical analysis on coin to confirm the purchase
+            if technical_analysis(coin):            
 
-            # only include coin as volatile if it hasn't been picked up in the last two TIME_DIFFERENCE minute cycles
-            if datetime.now() >= volatility_cooloff[coin] + timedelta(minutes=TIME_DIFFERENCE * 2):
-                volatility_cooloff[coin] = datetime.now()
+                if coin not in volatility_cooloff:
+                    volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE * 2)
 
-                
-                if len(coins_bought) + len(volatile_coins) < MAX_COINS or MAX_COINS == 0:
-                    volatile_coins[coin] = round(threshold_check, 3)
-                    print(f'{coin} has gained {volatile_coins[coin]}% within the last {TIME_DIFFERENCE} minutes, calculating volume in {PAIR_WITH}')
+                # only include coin as volatile if it hasn't been picked up in the last two TIME_DIFFERENCE minute cycles
+                if datetime.now() >= volatility_cooloff[coin] + timedelta(minutes=TIME_DIFFERENCE * 2):
+                    volatility_cooloff[coin] = datetime.now()
+
                     
+                    if len(coins_bought) + len(volatile_coins) < MAX_COINS or MAX_COINS == 0:
+                        volatile_coins[coin] = round(threshold_check, 3)
+                        print(f'{coin} has gained {volatile_coins[coin]}% within the last {TIME_DIFFERENCE} minutes, calculating volume in {PAIR_WITH}')
+                        
 
-                # track if coin is a moonshot. If so we want to make room for it
-                elif (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS != 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
-                    print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, will make room on next cycle.{txcolors.DEFAULT}')
-                    moonshotEvent = True
-                    moonshotCoin = coin
+                    # track if coin is a moonshot. If so we want to make room for it
+                    elif (len(coins_bought) + len(volatile_coins) >= MAX_COINS and MAX_COINS != 0) and MOONSHOT and (threshold_check > MOONSHOT_CHANGE_IN_PRICE):
+                        print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes. This is a moonshot event, will make room on next cycle.{txcolors.DEFAULT}')
+                        moonshotEvent = True
+                        moonshotCoin = coin
 
 
-                else:
-                    print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but you are holding max number of coins{txcolors.DEFAULT}')
-
+                    else:
+                        print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but you are holding max number of coins{txcolors.DEFAULT}')
+            
+            # technical analysis has failed
+            else:
+                print(f'{txcolors.WARNING}{coin} has gained {round(threshold_check, 3)}% within the last {TIME_DIFFERENCE} minutes, but the technical analysis has failed.{txcolors.DEFAULT}')
 
         # coin has gained but we do not detect an upwards trend
         elif threshold_check > CHANGE_IN_PRICE:
@@ -213,39 +221,7 @@ def wait_for_price():
         else:
             coins_unchanged +=1
 
-
-    # Here goes new code for external signalling
-    externalDir = 'signals/'
-    externals = external_signals(externalDir)
-    exnumber = 0
-    
-    for excoin in externals:
-        if excoin not in volatile_coins and excoin not in coins_bought and \
-                (len(coins_bought) + exnumber + len(volatile_coins)) < MAX_COINS:
-            volatile_coins[excoin] = 1
-            exnumber +=1
-            print(f'External signal received on {excoin}, calculating volume in {PAIR_WITH}')
-
-
     return volatile_coins, len(volatile_coins), historical_prices[hsp_head]
-
-
-def external_signals(dir):
-    external_list = {}
-    signals = {}
-
-    # check directory and load pairs from files into external_list
-    signals = glob.glob( dir + "*.exs")
-    for filename in signals:
-        for line in open(filename):
-            symbol = line.strip()
-            external_list[symbol] = symbol
-        try:
-            os.remove(filename)
-        except:
-            if DEBUG: print(f'{txcolors.WARNING}Could not remove external signalling file{txcolors.DEFAULT}')
-
-    return external_list
 
 
 def pause_bot():
