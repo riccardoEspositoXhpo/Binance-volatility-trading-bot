@@ -449,8 +449,8 @@ def sell_coins():
                 stagnating_coin = True
                   
         # define stop loss and take profit
-        TP = float(coins_bought[coin]['bought_at']) + (float(coins_bought[coin]['bought_at']) * coins_bought[coin]['take_profit']) / 100
-        SL = float(coins_bought[coin]['bought_at']) + (float(coins_bought[coin]['bought_at']) * coins_bought[coin]['stop_loss']) / 100
+        TP = float(coins_bought[coin]['bought_at']) * float(100 + coins_bought[coin]['take_profit']) / 100
+        SL = float(coins_bought[coin]['bought_at']) * float(100 + coins_bought[coin]['stop_loss']) / 100
 
 
         LastPrice = float(last_price[coin]['price'])
@@ -459,8 +459,6 @@ def sell_coins():
 
         # check that the price is above the take profit and readjust SL and TP accordingly if trialing stop loss used
         if LastPrice > TP and USE_TRAILING_STOP_LOSS:
-
-            coins_bought[coin]['take_profit'] = TP + TRAILING_TAKE_PROFIT
 
             # Flag that tp or sl have been hit at least once. This indicates an upward trend in the coin, so we do not want to sell it.
             coins_bought[coin]['tp_sl_hit'] += 1
@@ -473,7 +471,8 @@ def sell_coins():
             else:
                 coins_bought[coin]['stop_loss'] = coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS_LOCK
                 if DEBUG: print(f"{coin} TP reached at least {TP_HIT_COUNT_LOCK_IN} times, SL set to {(coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS_LOCK):.2f} instead of {(coins_bought[coin]['take_profit'] - TRAILING_STOP_LOSS):.2f}")
-           
+
+            coins_bought[coin]['take_profit'] += TRAILING_TAKE_PROFIT
 
             if DEBUG: print(f"{coin} TP reached, adjusting TP {coins_bought[coin]['take_profit']:.2f}  and SL {coins_bought[coin]['stop_loss']:.2f} accordingly to lock-in profit")
 

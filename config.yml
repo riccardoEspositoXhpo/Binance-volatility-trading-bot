@@ -50,7 +50,7 @@ trading_options:
   MAX_COINS: 5
 
   # the amount of time in MINUTES to calculate the difference from the current price (minimum: 1).
-  TIME_DIFFERENCE: 5
+  TIME_DIFFERENCE: 4
 
   # Number of times to check for TP/SL during each TIME_DIFFERENCE (minimum: 1).
   # Don't spam the Binance API, you will be banned (max 1200 requests per minute per IP).
@@ -63,7 +63,7 @@ trading_options:
   STOP_LOSS: 5
   
   # define in % when to take profit on a profitable coin.
-  TAKE_PROFIT: 2
+  TAKE_PROFIT: 1
 
   # Use custom tickers.txt list for filtering pairs.
   CUSTOM_LIST: True
@@ -77,7 +77,7 @@ trading_options:
   # when hit TAKE_PROFIT, move STOP_LOSS to TRAILING_STOP_LOSS percentage points below TAKE_PROFIT hence locking in profit
   # when hit TAKE_PROFIT, move TAKE_PROFIT up by TRAILING_TAKE_PROFIT percentage points
   TRAILING_STOP_LOSS: 5
-  TRAILING_TAKE_PROFIT: 2
+  TRAILING_TAKE_PROFIT: 1
 
   # Number of times TP must be hit before we tighten SL
   TP_HIT_COUNT_LOCK_IN: 3
@@ -87,11 +87,11 @@ trading_options:
   # Detect coins that are stagnating (i.e. price is too stable) and TP/SL are unlikely to be reached
   # Free up the space for better opportunities. Select the interval in minutes.
   SELL_STAGNATING_COIN: True
-  SELL_STAGNATING_INTERVAL: 300
+  SELL_STAGNATING_INTERVAL: 60
 
   # Implement a strategy that will sell a coin to make room for an extreme moonshot event
   MOONSHOT: True
-  MOONSHOT_CHANGE_IN_PRICE: 10
+  MOONSHOT_CHANGE_IN_PRICE: 8
   
   # Options are Best, Worst. Which coin to sacrifice to make room for Moonshot. Any other value will result in a random coin being sold.
   MOONSHOT_SACRIFICE: 'WORST' 
