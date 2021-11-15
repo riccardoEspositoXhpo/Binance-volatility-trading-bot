@@ -10,9 +10,10 @@ import glob
 import time
 import threading
 
-# Indicators to use in Technical Analysis
+# indicators to use in Technical Analysis
 INDICATORS = ['EMA5', 'EMA10', 'EMA20', 'EMA30', 'RSI', 'ADX', 'ADX+DI', 'ADX-DI', 'MACD.macd', 'MACD.signal', 'HullMA9']
-INTERVAL = Interval.INTERVAL_5_MINUTES #Timeframe for analysis
+INTERVAL = Interval.INTERVAL_5_MINUTES # timeframe for analysis
+TIME_TO_WAIT = 5 # time to wait in minutes before the last analysis
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
@@ -84,3 +85,4 @@ if __name__ == '__main__':
 # flag potential buys statically in some file (like test_coins_bought.json tipo)
 # re-run analysis a second time
 # drop a signal on a coin that was present both times
+
