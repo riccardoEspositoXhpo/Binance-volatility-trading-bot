@@ -129,7 +129,6 @@ def wait_for_price():
     global historical_prices, hsp_head, volatility_cooloff, moonshotEvent, moonshotCoin
 
     volatile_coins = {}
-    externals = {}
 
     coins_up = 0
     coins_down = 0
@@ -142,7 +141,7 @@ def wait_for_price():
         # sleep for exactly the amount of time required
         time.sleep((timedelta(minutes=float(TIME_DIFFERENCE / RECHECK_INTERVAL)) - (datetime.now() - historical_prices[hsp_head]['BNB' + PAIR_WITH]['time'])).total_seconds())
 
-    print(f'Working...Session profit:{session_profit:.2f}% Amount:${(QUANTITY * MAX_COINS * session_profit)/100:.2f}')
+    print(f'Working... Session profit:{session_profit:.2f}% Amount:${(QUANTITY * MAX_COINS * session_profit)/100:.2f}')
 
     # retreive latest prices
     get_price()
@@ -156,10 +155,6 @@ def wait_for_price():
 
         threshold_check = (-1.0 if min_price[coin]['time'] > max_price[coin]['time'] else 1.0) * (float(max_price[coin]['price']) - float(min_price[coin]['price'])) / float(min_price[coin]['price']) * 100
 
-
-        # discover is historical_prices[hsp_head] has latest price. Check if it is in some neighborhood of max_prcie!
-        
-
         # after a coin has been sacrificed for a moonshot, add the moonshotcoin to volatile_coins
         if moonshotEvent and coin == moonshotCoin:
 
@@ -172,16 +167,17 @@ def wait_for_price():
             moonshotEvent = False
 
         # each coin with higher gains than our CHANGE_IN_PRICE is added to the volatile_coins dict if less than MAX_COINS is not reached.
-        # also detect if the coin's latest price is trading with an upwards momentum
         if threshold_check > CHANGE_IN_PRICE:
+
+            LastPrice = float(historical_prices[hsp_head][coin]['price'])
+
             coins_up +=1
     
-
             if DEBUG:
                 print(f"Coin: {coin}. Percent Change: {round(threshold_check,3)}%")
 
             # run technical analysis on coin to confirm the purchase
-            if technical_analysis(coin):            
+            if technical_analysis(coin, LastPrice):            
 
                 if coin not in volatility_cooloff:
                     volatility_cooloff[coin] = datetime.now() - timedelta(minutes=TIME_DIFFERENCE * 2)

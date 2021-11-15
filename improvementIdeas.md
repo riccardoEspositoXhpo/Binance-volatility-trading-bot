@@ -43,13 +43,21 @@
 - Adds coin to ticker list
 - Suggested not to run this more than once per day
 
-## Custom Signal Mod - TODO
+## Technical Analysis - DONE
 
-- Configure custsignalmod to implement a trading strategy based on technical indicators
-- Strategy desc goes here
+- Configure a trading strategy based on technical indicators
+- Each time we find an eligible coin, we run the technical analysis to confirm that we should buy it
+- Strategy is configurable in technical_analysis.py
+- Strategy:
+  - EMA
+  - RSI
+  - ADX
+  - MACD
 
 ## Issues Log
 
 - Seems that if we buy too many coins we may be missing out on opportunities. we have the moonshot logic, but should we compute a "relative coin strenth" to see if we should substitute?
-  - ideally you identify a coin, there is no space, you evaluate all your other investments, is it better? if yes, drop the bad coin and get the good one. always invest in good ones.
-  - this completmens the moonshot strategy, we keep that
+- ideally you identify a coin, there is no space, you evaluate all your other investments, is it better? if yes, drop the bad coin and get the good one. always invest in good ones.
+- we could also implement the technical analysis to sell? nah wtvr not yet at least.
+
+

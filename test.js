@@ -27,7 +27,7 @@ var indicators = {
 
 /* BUY if on shortest timeframe
  
- (EMA) 5 > 10 > 20 > 30 > 50 (check if we care about 50) - price at least greater than the 10
+ (EMA) 5 > 10 > 20  (check if we care about 50) - price at least greater than the 10
  (RSI) between 30 and 70
  (ADX) above 20
  (ADX) +DI > -DI

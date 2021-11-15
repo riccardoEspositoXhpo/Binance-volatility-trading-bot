@@ -37,24 +37,24 @@ EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
 
 
-analyzed_coins = {}
+analyzed_coin = {}
 
-def analyze(coin):
+def analyze(coin, price):
     
-    global analyzed_coins
+    global analyzed_coin
     
-    analyzed_coins = {}
+    analyzed_coin = {}
     
     extract_indicators(coin)
 
-    passed = run_technical_analysis()
+    passed = run_technical_analysis(price)
 
     return passed
 
 
 def extract_indicators(coin):
 
-    global analyzed_coins
+    global analyzed_coin
 
     try:
         handler = TA_Handler(
@@ -72,27 +72,42 @@ def extract_indicators(coin):
         print (f'Coin: {coin}')
         print (f'handler: {handler}')
 
-    analyzed_coins[coin] = {}
-
     indicators = analysis.indicators
 
     for indicator in INDICATORS:
 
-        analyzed_coins[coin][indicator] = indicators[indicator]
+        analyzed_coin[indicator] = indicators[indicator]
 
 
-def run_technical_analysis():
+def run_technical_analysis(price):
 
-    global analyzed_coins
+    global analyzed_coin
     
     passed = True
 
+    # check 1 - ensure the EMAs are in order
+    if not (price > analyzed_coin['EMA5'] > analyzed_coin['EMA10'] > analyzed_coin['EMA20']):
+        passed = False
+
+    # check 2 - ensure RSI is within 30 / 70 bound
+    if not(analyzed_coin['RSI'] > 30 and analyzed_coin['RSI'] < 70):
+        passed = False
+    
+    # check 3 - ensure ADX above 20 and ADX+DI > ADX-DI
+    if not(analyzed_coin['ADX'] >= 20 and (analyzed_coin['ADX+DI'] > analyzed_coin['ADX-DI'])):
+        passed = False
+    
+    # check 4 - MACD Line above MACD Signal
+    if not(analyzed_coin['MACD.macd'] > analyzed_coin['MACD.signal']):
+        passed = False
+
+
     return passed
 
-def technical_analysis(coin):
+def technical_analysis(coin, price):
 
     print(f'Technical Analysis: Analyzing {coin} pair')
-    passed = analyze(coin)
+    passed = analyze(coin, price)
 
     if passed:
         print(f'Technical Analysis: Success - BUY')
@@ -100,3 +115,10 @@ def technical_analysis(coin):
         print(f'Technical Analysis: Failure - NO BUY')
 
     return passed
+
+
+if __name__ == '__main__':
+    coin = 'UMAUSDT'
+    price = 64000
+    technical_analysis(coin,price)
+    print(analyzed_coin)
