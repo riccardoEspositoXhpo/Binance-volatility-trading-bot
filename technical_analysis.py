@@ -86,12 +86,12 @@ def run_technical_analysis(price):
     passed = True
 
     # check 1 - ensure the EMAs are in order
-    if not (price > analyzed_coin['EMA5'] > analyzed_coin['EMA10'] > analyzed_coin['EMA20']):
+    if not (price > analyzed_coin['EMA5'] > analyzed_coin['EMA10'] and (analyzed_coin['EMA5'] > analyzed_coin['EMA20'])):
         passed = False
 
     # check 2 - ensure RSI is within 30 / 70 bound
-    if not(analyzed_coin['RSI'] > 30 and analyzed_coin['RSI'] < 70):
-        passed = False
+    # if not(analyzed_coin['RSI'] > 30 and analyzed_coin['RSI'] < 70):
+    #     passed = False
     
     # check 3 - ensure ADX above 20 and ADX+DI > ADX-DI
     if not(analyzed_coin['ADX'] >= 20 and (analyzed_coin['ADX+DI'] > analyzed_coin['ADX-DI'])):
@@ -111,14 +111,11 @@ def technical_analysis(coin, price):
 
     if passed:
         print(f'Technical Analysis: Success - BUY')
-    else:
-        print(f'Technical Analysis: Failure - NO BUY')
-
+        
     return passed
 
 
-if __name__ == '__main__':
-    coin = 'UMAUSDT'
-    price = 64000
-    technical_analysis(coin,price)
-    print(analyzed_coin)
+# if __name__ == '__main__':
+#     coin = 'UMAUSDT'
+#     price = 64000
+#     technical_analysis(coin,price)
