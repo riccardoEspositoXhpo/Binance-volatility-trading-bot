@@ -58,6 +58,5 @@
 
 - Seems that if we buy too many coins we may be missing out on opportunities. we have the moonshot logic, but should we compute a "relative coin strenth" to see if we should substitute?
 - ideally you identify a coin, there is no space, you evaluate all your other investments, is it better? if yes, drop the bad coin and get the good one. always invest in good ones.
-- we could also implement the technical analysis to sell? nah wtvr not yet at least.
-
+- improve the technial analysis to flag buy and sell logic.
 
