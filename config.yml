@@ -45,6 +45,8 @@ trading_options:
     - RUB
     - ZAR
     - AUD
+    - NANOUSDT
+    - BTTUSDT
 
   # Maximum number of trade 'slots' at any time (your USDT balance must be at least MAX_COINS * QUANTITY)
   MAX_COINS: 5
@@ -57,7 +59,7 @@ trading_options:
   RECHECK_INTERVAL: 20
 
   # the difference in % between the first and second checks for the price.
-  CHANGE_IN_PRICE: 3
+  CHANGE_IN_PRICE: 30
 
   # define in % when to sell a coin that's not making a profit.
   STOP_LOSS: 5
@@ -91,7 +93,7 @@ trading_options:
 
   # Implement a strategy that will sell a coin to make room for an extreme moonshot event
   MOONSHOT: True
-  MOONSHOT_CHANGE_IN_PRICE: 8
+  MOONSHOT_CHANGE_IN_PRICE: 80
   
   # Options are Best, Worst. Which coin to sacrifice to make room for Moonshot. Any other value will result in a random coin being sold.
   MOONSHOT_SACRIFICE: 'WORST' 
@@ -105,6 +107,7 @@ trading_options:
   SIGNALLING_MODULES:
     - updatetickermod
     - pausebotmod
+    - technical_analysis
 
     
   

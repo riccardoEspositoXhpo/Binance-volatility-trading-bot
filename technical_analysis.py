@@ -36,20 +36,35 @@ PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
 
+PAIR_WITH = 'USDT'
+TICKERS = 'tickers.txt'
+TIME_TO_WAIT = 1 # minutes to wait between analyses
 
 analyzed_coin = {}
+failed_coins = []
+failed_then_success_coins = []
 
-def analyze(coin, price):
+
+def technical_analysis(coin):
     
     global analyzed_coin
+    global failed_coins
+    global failed_then_success_coins
     
     analyzed_coin = {}
     
     extract_indicators(coin)
 
-    passed = run_technical_analysis(price)
+    try:
+        passed = run_technical_analysis()
+    except:
+        print("Cannot retrieve analysis for " + coin)
+        passed = True
 
-    return passed
+    if not passed and coin not in failed_coins:
+        failed_coins.append(coin)
+    elif passed and coin in failed_coins:
+        failed_then_success_coins.append(coin)
 
 
 def extract_indicators(coin):
@@ -65,57 +80,98 @@ def extract_indicators(coin):
                 timeout= 10)
         analysis = handler.get_analysis()
 
+        indicators = analysis.indicators
+
+        for indicator in INDICATORS:
+
+            analyzed_coin[indicator] = indicators[indicator]
+
     except Exception as e:
-        print("CustSignal - ")
-        print("Exception:")
-        print(e)
-        print (f'Coin: {coin}')
-        print (f'handler: {handler}')
-
-    indicators = analysis.indicators
-
-    for indicator in INDICATORS:
-
-        analyzed_coin[indicator] = indicators[indicator]
+        pass
 
 
-def run_technical_analysis(price):
+def run_technical_analysis():
 
     global analyzed_coin
     
     passed = True
 
-    # check 1 - ensure the EMAs are in order
-    if not (price > analyzed_coin['EMA5'] > analyzed_coin['EMA10'] and (analyzed_coin['EMA5'] > analyzed_coin['EMA20'])):
+    # # check 1 - ensure the EMAs are in order
+    if not (analyzed_coin['EMA5'] > analyzed_coin['EMA10'] and (analyzed_coin['EMA5'] > analyzed_coin['EMA20'])):
         passed = False
 
     # check 2 - ensure RSI is within 30 / 70 bound
     # if not(analyzed_coin['RSI'] > 30 and analyzed_coin['RSI'] < 70):
     #     passed = False
     
-    # check 3 - ensure ADX above 20 and ADX+DI > ADX-DI
-    if not(analyzed_coin['ADX'] >= 20 and (analyzed_coin['ADX+DI'] > analyzed_coin['ADX-DI'])):
-        passed = False
+    # # check 3 - ensure ADX above 20 and ADX+DI > ADX-DI
+    # if not(analyzed_coin['ADX'] >= 20 and (analyzed_coin['ADX+DI'] > analyzed_coin['ADX-DI'])):
+    #     passed = False
     
     # check 4 - MACD Line above MACD Signal
-    if not(analyzed_coin['MACD.macd'] > analyzed_coin['MACD.signal']):
-        passed = False
+    # if not(analyzed_coin['MACD.macd'] > analyzed_coin['MACD.signal']):
+    #     passed = False
 
 
     return passed
 
-def technical_analysis(coin, price):
-
-    print(f'Technical Analysis: Analyzing {coin} pair')
-    passed = analyze(coin, price)
-
-    if passed:
-        print(f'Technical Analysis: Success - BUY')
-        
-    return passed
 
 
-# if __name__ == '__main__':
-#     coin = 'UMAUSDT'
-#     price = 64000
-#     technical_analysis(coin,price)
+def analyze(pairs):
+
+    global failed_coins
+    global failed_then_success_coins
+
+    signal_coins = {}
+  
+    if os.path.exists('signals/signalsample.exs'):
+        os.remove('signals/signalsample.exs')
+    
+    for pair in pairs:
+       
+       technical_analysis(pair)
+       
+       if pair in failed_then_success_coins:   
+        failed_then_success_coins.pop(pair)       
+        failed_coins.pop(pair)       
+        signal_coins[pair] = pair
+        print(f'Signalsample: Signal detected on {pair}')
+        with open('signals/signalsample.exs','a+') as f:
+            f.write(pair + '\n')
+
+    # debugging logic
+    print(failed_coins)
+    print(failed_then_success_coins)
+    return signal_coins
+
+
+def do_work():
+    global failed_coins
+    global failed_then_success_coins
+
+    failed_coins = []
+    failed_then_success_coins = []
+
+   
+    signal_coins = {}
+    pairs = {}
+
+    pairs=[line.strip() for line in open(TICKERS)]
+    for line in open(TICKERS):
+        pairs=[line.strip() + PAIR_WITH for line in open(TICKERS)] 
+    
+
+    while True:
+        print(f'Signalsample: Analyzing {len(pairs)} coins')
+        signal_coins = analyze(pairs)
+
+        if len(signal_coins) == 0:
+            print(f'Signalsample: No coins above threshold on both timeframes. Waiting {TIME_TO_WAIT} minutes for next analysis')
+        else:
+            print(f'Signalsample: {len(signal_coins)} coins above treshold on both timeframes. Waiting {TIME_TO_WAIT} minutes for next analysis')
+
+        time.sleep((TIME_TO_WAIT*60))
+
+
+# devi segnare uno che non é in fila, e poi diventa in fila. you get me?
+# poi scopriamo il sell... che semplicemente vendi se diventa "failed" il technical analysis. controlli dall'altra parte

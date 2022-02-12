@@ -43,20 +43,10 @@
 - Adds coin to ticker list
 - Suggested not to run this more than once per day
 
-## Technical Analysis - DONE
+## Technical Analysis - TODO
 
 - Configure a trading strategy based on technical indicators
-- Each time we find an eligible coin, we run the technical analysis to confirm that we should buy it
-- Strategy is configurable in technical_analysis.py
-- Strategy:
-  - EMA
-  - RSI
-  - ADX
-  - MACD
+- We want to collect the coins that have are "about to pump". This is done via the EMA
+- We store coins where EMA not in order, if in the following period they are in order, this is a coin to buy.
 
 ## Issues Log
-
-- Seems that if we buy too many coins we may be missing out on opportunities. we have the moonshot logic, but should we compute a "relative coin strenth" to see if we should substitute?
-- ideally you identify a coin, there is no space, you evaluate all your other investments, is it better? if yes, drop the bad coin and get the good one. always invest in good ones.
-- improve the technial analysis to flag buy and sell logic.
-
